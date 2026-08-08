@@ -313,10 +313,6 @@ const Practice = () => {
   return <div className="practice-page-container min-h-screen pt-24 pb-20 sm:pt-32 sm:pb-32 px-4 md:px-6 relative overflow-hidden">
   <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[60px] rounded-full max-w-full" /> <div className="max-w-[1400px] mx-auto relative z-10">
   <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="max-w-5xl mx-auto mb-12 text-center flex flex-col items-center">
-    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold uppercase tracking-widest text-[10px] mb-6">
-      <Sparkles className="w-4 h-4" />
-      Practice & Interview Prep
-    </div>
     <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tighter leading-tight text-center">
       Master Coding & <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500">English Grammar</span>
     </h1>

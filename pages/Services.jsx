@@ -12,12 +12,9 @@ const Services = () => {
  <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[60px] rounded-full" /> <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 blur-[60px] rounded-full" />
 
  <div className="max-w-[1400px] mx-auto relative z-10"> <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-4xl mx-auto mb-20">
- <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold uppercase tracking-widest text-[10px] mb-6"> <Sparkles className="w-4 h-4" />
- Our Services
- </div>
  <h1 className="text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tighter leading-[0.9]"> Technology Solutions<br />for <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500">Modern Schools</span>
  </h1>
- <p className="text-lg text-slate-500 max-w-2xl mx-auto font-medium">
+ <p className="text-lg text-slate-500 max-w-2xl mx-auto font-medium text-center">
  Comprehensive digital solutions designed to empower educational institutions with cutting-edge technology.
  </p>
  </motion.div>

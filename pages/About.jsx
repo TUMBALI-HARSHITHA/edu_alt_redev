@@ -15,10 +15,7 @@ const About = () => {
         {
     /* Mission Hero */
   }
-        <MotionDiv initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="text-center max-w-4xl mx-auto mb-28"> <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold uppercase tracking-widest text-[10px] mb-6">
-            <Sparkles className="w-4 h-4" />
-            Our Mission
-          </div>
+        <MotionDiv initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className="text-center max-w-4xl mx-auto mb-28">
           <h1 className="text-[2rem] sm:text-4xl md:text-6xl font-black text-slate-900 mb-8 tracking-tighter leading-[0.9]"> Empowering the Next Generation of{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500 animate-shimmer-text">Innovators</span>
           </h1>
@@ -28,7 +25,7 @@ const About = () => {
 
           <div className="grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {[
-    { icon: <Target className="w-10 h-10" />, title: "Our Vision", desc: "A world where learning and real-world skills go hand-in-hand\u2014making every learner future-ready.", bgColor: "#add8e6" },
+    { icon: <Target className="w-10 h-10" />, title: "Our Vision", desc: "A world where learning and real-world skills go hand-in-hand—making every learner future-ready.", bgColor: "#add8e6" },
     { icon: <HeartHandshake className="w-10 h-10" />, title: "Our Promise", desc: "We partner with you to deliver high-quality, relevant education that actually opens doors.", bgColor: "#99e6b3" },
     { icon: <Rocket className="w-10 h-10" />, title: "Our Drive", desc: "Continuous innovation. We evolve our platform every day to keep you ahead of industry trends.", bgColor: "#add8e6" }
   ].map((item, idx) => <div
@@ -48,11 +45,9 @@ const About = () => {
         {
     /* Our Story */
   }
-        <MotionDiv initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-28 max-w-4xl mx-auto"> <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-700 font-bold uppercase tracking-widest text-[10px] mb-6">
-            <BookOpen className="w-4 h-4" />
-            Our Story
-          </div>
-          <h2 className="text-[2rem] sm:text-4xl md:text-5xl font-black text-slate-900 mb-8 tracking-tighter">Why We Built Edu Alt Tech</h2> <div className="space-y-6 text-slate-600 leading-relaxed text-base sm:text-lg">
+        <MotionDiv initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-28 max-w-4xl mx-auto text-center">
+          <h2 className="text-[2rem] sm:text-4xl md:text-5xl font-black text-slate-900 mb-8 tracking-tighter text-center">Why We Built Edu Alt Tech</h2>
+          <div className="space-y-6 text-slate-600 leading-relaxed text-base sm:text-lg text-left sm:text-center">
             <p>We realized something was missing: schools teach for exams, but the real world demands skills. So, we built a platform that masters both.</p>
             <p><strong>🎓 For Students:</strong> We offer everything from AI, coding, and digital marketing to the creative arts—plus top-tier academic support in core subjects.</p>
             <p><strong>🏫 For Schools:</strong> We drive your digital transformation with custom websites, mobile apps, ERP systems, and smart AI tools.</p>
@@ -73,18 +68,9 @@ const About = () => {
           </div>
 
           <div className="text-center mb-16 relative z-10">
-            <MotionDiv
-    initial={{ opacity: 0, scale: 0.9 }}
-    whileInView={{ opacity: 1, scale: 1 }}
-    viewport={{ once: true }}
-    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 !text-indigo-700 font-bold uppercase tracking-widest text-[10px] mb-6"
-  >
-              <Users className="w-4 h-4" />
-              Our People
-            </MotionDiv>
-            <h2 className="text-[2rem] sm:text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tighter"> Meet the <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-emerald-500 to-teal-500">Team</span>
+            <h2 className="text-[2rem] sm:text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tighter text-center"> Meet the <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-emerald-500 to-teal-500">Team</span>
             </h2>
-            <p className="text-sm sm:text-lg text-slate-500 max-w-xl mx-auto">The innovators, builders, and creators shaping the future of Edu Alt Tech</p>
+            <p className="text-sm sm:text-lg text-slate-500 max-w-xl mx-auto text-center">The innovators, builders, and creators shaping the future of Edu Alt Tech</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
