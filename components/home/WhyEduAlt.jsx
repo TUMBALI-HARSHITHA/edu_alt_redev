@@ -26,7 +26,13 @@ const WhyEduAlt = () => {
               className="space-y-4 text-left"
             >
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tighter leading-[0.95] pb-2">
-                Why Edu Alt Tech?
+                <span
+                  className="text-slate-900 font-bitcount mr-2 inline-block"
+                  style={{ fontFamily: '"Bitcount Prop Single", cursive, sans-serif' }}
+                >
+                  Why
+                </span>
+                Edu Alt Tech?
               </h2>
               <p className="text-sm sm:text-base text-slate-500 font-medium max-w-xl pb-3">
                 One platform to explore, learn, and turn knowledge into real-world opportunities.

@@ -77,20 +77,20 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
 
   return (
     <div className="w-full flex items-center justify-center p-4 sm:p-6 md:p-8 font-sans">
-      {/* Outer Card Container with Clean Theme Background & Brand Border Glow */}
+      {/* Outer Card Container with Warm Mango Ambient Glow & Rounded Border */}
       <motion.div
         animate={{
           boxShadow: isAnimating
-            ? '0 0 25px rgba(60,179,113,0.6), 0 0 50px rgba(0,71,171,0.3)'
-            : '0 20px 50px -10px rgba(0,0,0,0.1), 0 0 30px rgba(60,179,113,0.25)'
+            ? '0 0 45px rgba(255,160,0,0.75), 0 0 80px rgba(255,183,3,0.5), 0 20px 60px rgba(0,0,0,0.12)'
+            : '0 0 35px rgba(255,160,0,0.45), 0 0 60px rgba(255,183,3,0.25), 0 20px 50px -10px rgba(0,0,0,0.1)'
         }}
         transition={{ duration: 0.45, ease: 'easeInOut' }}
-        className="w-full max-w-[850px] min-h-[520px] bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-3xl relative overflow-hidden flex flex-col md:block shadow-2xl"
+        className="w-full max-w-[850px] min-h-[520px] bg-white/95 backdrop-blur-xl border border-[#FFA000]/40 ring-4 ring-[#FFA000]/10 rounded-3xl relative overflow-hidden flex flex-col md:block shadow-2xl"
       >
         {/* DESKTOP / TABLET LAYOUT */}
         <div className="hidden md:block absolute inset-0 w-full h-full">
           
-          {/* BRAND PANEL - Sliding Diagonal Background: Green rgb(60, 179, 113) */}
+          {/* BRAND PANEL - Sliding Diagonal Background: Golden Mango Gradient */}
           <motion.div
             initial={false}
             animate={{
@@ -100,7 +100,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                 : 'polygon(0% 0%, 100% 0%, 84% 100%, 0% 100%)'
             }}
             transition={{ duration: 0.5, ease: [0.4, 0.0, 0.2, 1] }}
-            className={`absolute top-0 w-[56%] h-full bg-gradient-to-br from-[#3CB371] to-[#2E8B57] z-10 flex flex-col items-center justify-center py-8 text-center shadow-2xl transition-all duration-300 ${
+            className={`absolute top-0 w-[56%] h-full bg-gradient-to-br from-[#FFB703] via-[#FFA000] to-[#E65100] z-10 flex flex-col items-center justify-center py-8 text-center shadow-2xl transition-all duration-300 ${
               isLogin ? 'pl-20 pr-8' : 'pl-8 pr-20'
             }`}
           >
@@ -114,7 +114,8 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                 className="max-w-[260px] space-y-4"
               >
                 <h2 className="text-[36px] font-black text-[#002355] tracking-wide whitespace-nowrap leading-[1.2]">
-                  {isLogin ? 'Welcome Back!' : 'Welcome!'}
+                  <span className="italic font-georgia" style={{ fontFamily: 'Georgia, serif' }}>Welcome</span>
+                  {isLogin ? ' Back!' : '!'}
                 </h2>
                 <p className="text-[#002355]/90 text-[15px] font-medium leading-[1.6]">
                   {isLogin
@@ -142,7 +143,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                   transition={{ duration: 0.4, ease: 'easeInOut' }}
                   className="absolute left-0 top-0 w-[55%] h-full pl-[60px] pr-[40px] py-10 flex flex-col justify-center bg-white/95 pointer-events-auto"
                 >
-                  <h1 className="text-[34px] font-black text-[#0047AB] mb-6 leading-[1.2]">
+                  <h1 className="text-[34px] font-black text-[#0047AB] mb-6 leading-[1.2] italic font-georgia" style={{ fontFamily: 'Georgia, serif' }}>
                     Login
                   </h1>
 
@@ -167,7 +168,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                             setEmail(e.target.value);
                           }}
                           placeholder="Enter your username or email"
-                          className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-10 outline-none focus:border-[#3CB371] transition-colors placeholder:text-slate-400 font-medium"
+                          className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-10 outline-none focus:border-[#FFA000] transition-colors placeholder:text-slate-400 font-medium"
                         />
                         <User className="w-5 h-5 text-slate-400 absolute right-2 bottom-2.5 pointer-events-none group-focus-within:text-[#3CB371] transition-colors" />
                       </div>
@@ -184,7 +185,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Enter your password"
-                          className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-12 outline-none focus:border-[#3CB371] transition-colors placeholder:text-slate-400 font-medium"
+                          className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-12 outline-none focus:border-[#FFA000] transition-colors placeholder:text-slate-400 font-medium"
                         />
                         <div className="absolute right-2 bottom-2.5 flex items-center gap-2">
                           <button
@@ -213,7 +214,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                       Don't have an account?{' '}
                       <span
                         onClick={toggleState}
-                        className="text-[#3CB371] hover:underline font-extrabold cursor-pointer ml-1"
+                        className="text-[#FFA000] hover:underline font-extrabold cursor-pointer ml-1"
                       >
                         Sign Up
                       </span>
@@ -234,7 +235,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                   transition={{ duration: 0.4, ease: 'easeInOut' }}
                   className="absolute right-0 top-0 w-[55%] h-full pr-[60px] pl-[40px] py-10 flex flex-col justify-center bg-white/95 pointer-events-auto"
                 >
-                  <h1 className="text-[34px] font-black text-[#0047AB] mb-6 leading-[1.2]">
+                  <h1 className="text-[34px] font-black text-[#0047AB] mb-6 leading-[1.2] italic font-georgia" style={{ fontFamily: 'Georgia, serif' }}>
                     Register
                   </h1>
 
@@ -256,9 +257,9 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                           value={username}
                           onChange={(e) => setUsername(e.target.value)}
                           placeholder="Choose a username"
-                          className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-10 outline-none focus:border-[#3CB371] transition-colors placeholder:text-slate-400 font-medium"
+                          className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-10 outline-none focus:border-[#FFA000] transition-colors placeholder:text-slate-400 font-medium"
                         />
-                        <User className="w-5 h-5 text-slate-400 absolute right-2 bottom-2.5 pointer-events-none group-focus-within:text-[#3CB371] transition-colors" />
+                        <User className="w-5 h-5 text-slate-400 absolute right-2 bottom-2.5 pointer-events-none group-focus-within:text-[#FFA000] transition-colors" />
                       </div>
                     </div>
 
@@ -273,9 +274,9 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="name@example.com"
-                          className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-10 outline-none focus:border-[#3CB371] transition-colors placeholder:text-slate-400 font-medium"
+                          className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-10 outline-none focus:border-[#FFA000] transition-colors placeholder:text-slate-400 font-medium"
                         />
-                        <Mail className="w-5 h-5 text-slate-400 absolute right-2 bottom-2.5 pointer-events-none group-focus-within:text-[#3CB371] transition-colors" />
+                        <Mail className="w-5 h-5 text-slate-400 absolute right-2 bottom-2.5 pointer-events-none group-focus-within:text-[#FFA000] transition-colors" />
                       </div>
                     </div>
 
@@ -290,17 +291,17 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="Create a password"
-                          className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-12 outline-none focus:border-[#3CB371] transition-colors placeholder:text-slate-400 font-medium"
+                          className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-12 outline-none focus:border-[#FFA000] transition-colors placeholder:text-slate-400 font-medium"
                         />
                         <div className="absolute right-2 bottom-2.5 flex items-center gap-2">
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="text-slate-400 hover:text-[#3CB371] transition-colors"
+                            className="text-slate-400 hover:text-[#FFA000] transition-colors"
                           >
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
-                          <Lock className="w-5 h-5 text-slate-400 group-focus-within:text-[#3CB371] transition-colors pointer-events-none" />
+                          <Lock className="w-5 h-5 text-slate-400 group-focus-within:text-[#FFA000] transition-colors pointer-events-none" />
                         </div>
                       </div>
                     </div>
@@ -319,7 +320,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                       Already have an account?{' '}
                       <span
                         onClick={toggleState}
-                        className="text-[#3CB371] hover:underline font-extrabold cursor-pointer ml-1"
+                        className="text-[#FFA000] hover:underline font-extrabold cursor-pointer ml-1"
                       >
                         Sign in
                       </span>
@@ -333,7 +334,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
 
         {/* MOBILE STACKED LAYOUT (<768px) */}
         <div className="md:hidden flex flex-col w-full">
-          <div className="w-full py-8 px-6 bg-gradient-to-r from-[#3CB371] to-[#2E8B57] text-center shadow-md">
+          <div className="w-full py-8 px-6 bg-gradient-to-r from-[#FFB703] via-[#FFA000] to-[#E65100] text-center shadow-md">
             <AnimatePresence mode="wait">
               <motion.div
                 key={isLogin ? 'mob-login-head' : 'mob-reg-head'}
@@ -343,7 +344,8 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                 transition={{ duration: 0.25 }}
               >
                 <h2 className="text-[32px] font-black text-[#002355] tracking-wide">
-                  {isLogin ? 'Welcome Back!' : 'Welcome!'}
+                  <span className="italic font-georgia" style={{ fontFamily: 'Georgia, serif' }}>Welcome</span>
+                  {isLogin ? ' Back!' : '!'}
                 </h2>
                 <p className="text-[#002355]/90 text-[14px] mt-2 font-medium">
                   {isLogin ? 'Sign in to access your account' : 'Register to get started with us'}
@@ -353,7 +355,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
           </div>
 
           <div className="p-6 bg-white">
-            <h1 className="text-[28px] font-black text-[#0047AB] mb-4">
+            <h1 className="text-[28px] font-black text-[#0047AB] mb-4 italic font-georgia" style={{ fontFamily: 'Georgia, serif' }}>
               {isLogin ? 'Login' : 'Register'}
             </h1>
 
@@ -378,7 +380,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                       setEmail(e.target.value);
                     }}
                     placeholder="Username or email"
-                    className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-10 outline-none focus:border-[#3CB371]"
+                    className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-10 outline-none focus:border-[#FFA000]"
                   />
                   <User className="w-5 h-5 text-slate-400 absolute right-2 bottom-2.5 pointer-events-none" />
                 </div>
@@ -396,7 +398,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Email"
-                      className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-10 outline-none focus:border-[#3CB371]"
+                      className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-10 outline-none focus:border-[#FFA000]"
                     />
                     <Mail className="w-5 h-5 text-slate-400 absolute right-2 bottom-2.5 pointer-events-none" />
                   </div>
@@ -414,7 +416,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Password"
-                    className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-12 outline-none focus:border-[#3CB371]"
+                    className="w-full bg-transparent border-b border-slate-300 text-slate-900 text-[15px] py-2.5 pr-12 outline-none focus:border-[#FFA000]"
                   />
                   <div className="absolute right-2 bottom-2.5 flex items-center gap-2">
                     <button
@@ -441,7 +443,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                 {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
                 <span
                   onClick={toggleState}
-                  className="text-[#3CB371] hover:underline font-extrabold cursor-pointer ml-1"
+                  className="text-[#FFA000] hover:underline font-extrabold cursor-pointer ml-1"
                 >
                   {isLogin ? 'Sign Up' : 'Sign in'}
                 </span>

@@ -16,6 +16,7 @@ export default {
         display: ['Poppins', 'Sora', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
         georgia: ['Georgia', 'serif'],
+        bitcount: ['"Bitcount Prop Single"', 'cursive', 'sans-serif'],
       },
       fontSize: {
         '4xl': ['2rem', { lineHeight: '2.25rem' }],

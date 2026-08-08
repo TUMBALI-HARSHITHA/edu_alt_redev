@@ -22,7 +22,7 @@ const HeroSection = () => {
             className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9]"
           >
             <span style={{ fontFamily: 'Georgia, serif' }}>Learn. Build.</span><br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0047AB] to-[#3CB371] italic" style={{ fontFamily: 'Georgia, serif' }}>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0047AB] to-[#3CB371] font-bitcount" style={{ fontFamily: '"Bitcount Prop Single", cursive, sans-serif' }}>
               Innovate.
             </span>
           </MotionH1>
