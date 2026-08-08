@@ -1,0 +1,963 @@
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { auth, db, storage, doc, getDoc, collection, query, where, getDocs, addDoc, updateDoc, serverTimestamp, ref, uploadBytes, getDownloadURL, onAuthStateChanged, orderBy, onSnapshot } from "../lib/firebase";
+import { PLATFORM_COURSES } from "../data/platformCourses";
+import { ArrowLeft, BookOpen, Video, FileText, Plus, Loader2, Users, X, ExternalLink, Calendar, GraduationCap, DollarSign, BarChart3, Copy, Repeat, MessageSquare, Send } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-hot-toast";
+import { getLastReadTimestamps, markCourseRead } from "../lib/chatNotifications";
+import SplashLoader from "../components/SplashLoader";
+const ADMIN_EMAILS = ["ukkukk97@gmail.com", "umakrishnakanthchokkapu15@gmail.com"];
+const TeacherPanel = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [viewMode, setViewMode] = useState("overview");
+  const [courses, setCourses] = useState([]);
+  const [expandedCourse, setExpandedCourse] = useState(null);
+  const [activeCourseTab, setActiveCourseTab] = useState("modules");
+  const [totalStudents, setTotalStudents] = useState(0);
+  const [firstClassStudents, setFirstClassStudents] = useState(0);
+  const [fullAccessStudents, setFullAccessStudents] = useState(0);
+  const [earnings, setEarnings] = useState({ total: 0, monthly: 0 });
+  const [upcomingClasses, setUpcomingClasses] = useState([]);
+  const [recurringClasses, setRecurringClasses] = useState([]);
+  const [showModuleModal, setShowModuleModal] = useState(null);
+  const [mTitle, setMTitle] = useState("");
+  const [mDesc, setMDesc] = useState("");
+  const [mThumbFile, setMThumbFile] = useState(null);
+  const [showLectureModal, setShowLectureModal] = useState(null);
+  const [lTitle, setLTitle] = useState("");
+  const [lMeet, setLMeet] = useState("");
+  const [lRec, setLRec] = useState("");
+  const [showResourceModal, setShowResourceModal] = useState(null);
+  const [rTitle, setRTitle] = useState("");
+  const [rUrl, setRUrl] = useState("");
+  const [modules, setModules] = useState([]);
+  const [resources, setResources] = useState([]);
+  const [loadingModules, setLoadingModules] = useState(false);
+  const [students, setStudents] = useState([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [courseChatMessages, setCourseChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [unreadCounts, setUnreadCounts] = useState({});
+  const [scheduledClasses, setScheduledClasses] = useState([]);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [sTitle, setSTitle] = useState("");
+  const [sDesc, setSDesc] = useState("");
+  const [sMeetLink, setSMeetLink] = useState("");
+  const [sDate, setSDate] = useState("");
+  const fetchModulesAndResources = async (courseId) => {
+    setLoadingModules(true);
+    try {
+      const [mSnap, rSnap] = await Promise.all([
+        getDocs(query(collection(db, "course_modules"), where("courseId", "==", courseId))),
+        getDocs(query(collection(db, "resources"), where("courseId", "==", courseId)))
+      ]);
+      const loadedModules = mSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      loadedModules.sort((a, b) => (a.order || 0) - (b.order || 0));
+      setModules(loadedModules);
+      setResources(rSnap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    } catch (e) {
+      console.error("Failed to load modules", e);
+    } finally {
+      setLoadingModules(false);
+    }
+  };
+  const fetchStudents = async (courseId) => {
+    setLoadingStudents(true);
+    try {
+      const { data, error } = await db.from("enrollments").select("*").eq("course_id", courseId).eq("role", "student");
+      if (error) throw error;
+      const studentList = await Promise.all((data || []).map(async (s) => {
+        let name = "Unknown Student";
+        let email = "";
+        let paymentStatus = s.payment_status || "not-required";
+        let plan = "first_class";
+        let enrolledAt = s.created_at || "";
+        try {
+          const uDoc = await getDoc(doc(db, "users", s.user_id));
+          if (uDoc.exists()) {
+            const uData = uDoc.data();
+            name = uData.displayName || uData.name || uData.email || "Unknown Student";
+            email = uData.email || "";
+          }
+          const eq = query(collection(db, "enrollments"), where("userId", "==", s.user_id), where("courseId", "==", courseId), where("role", "==", "student"));
+          const eSnap = await getDocs(eq);
+          if (!eSnap.empty) {
+            const eData = eSnap.docs[0]?.data();
+            if (eData.paymentStatus) paymentStatus = eData.paymentStatus;
+            if (eData.plan) plan = eData.plan;
+            if (eData.createdAt) enrolledAt = eData.createdAt?.toDate?.()?.toISOString() || eData.createdAt;
+          }
+        } catch (_) {
+        }
+        return { ...s, name, email, payment_status: paymentStatus, plan, created_at: enrolledAt, blocked: s.blocked || false, tags: s.tags || [] };
+      }));
+      setStudents(studentList);
+    } catch (e) {
+      console.error("Failed to load students", e);
+      toast.error("Failed to load students");
+    } finally {
+      setLoadingStudents(false);
+    }
+  };
+  const handleBlockStudent = async (enrollmentId) => {
+    try {
+      await updateDoc(doc(db, "enrollments", enrollmentId), { blocked: true });
+      setStudents((prev) => prev.map((s) => s.id === enrollmentId ? { ...s, blocked: true } : s));
+      toast.success("Student blocked");
+    } catch (e) {
+      toast.error(e?.message || "Failed to block student");
+    }
+  };
+  const handleUnblockStudent = async (enrollmentId) => {
+    try {
+      await updateDoc(doc(db, "enrollments", enrollmentId), { blocked: false });
+      setStudents((prev) => prev.map((s) => s.id === enrollmentId ? { ...s, blocked: false } : s));
+      toast.success("Student unblocked");
+    } catch (e) {
+      toast.error(e?.message || "Failed to unblock student");
+    }
+  };
+  const [tagInputs, setTagInputs] = useState({});
+  const handleAddTag = async (enrollmentId) => {
+    const tag = (tagInputs[enrollmentId] || "").trim();
+    if (!tag) return;
+    const student = students.find((s) => s.id === enrollmentId);
+    if (!student) return;
+    const currentTags = student.tags || [];
+    if (currentTags.includes(tag)) {
+      toast.error("Tag already exists");
+      return;
+    }
+    const newTags = [...currentTags, tag];
+    try {
+      await updateDoc(doc(db, "enrollments", enrollmentId), { tags: newTags });
+      setStudents((prev) => prev.map((s) => s.id === enrollmentId ? { ...s, tags: newTags } : s));
+      setTagInputs((prev) => ({ ...prev, [enrollmentId]: "" }));
+      toast.success("Tag added");
+    } catch (e) {
+      toast.error(e?.message || "Failed to add tag");
+    }
+  };
+  const handleRemoveTag = async (enrollmentId, tagToRemove) => {
+    const student = students.find((s) => s.id === enrollmentId);
+    if (!student) return;
+    const newTags = (student.tags || []).filter((t) => t !== tagToRemove);
+    try {
+      await updateDoc(doc(db, "enrollments", enrollmentId), { tags: newTags });
+      setStudents((prev) => prev.map((s) => s.id === enrollmentId ? { ...s, tags: newTags } : s));
+    } catch (e) {
+      toast.error(e?.message || "Failed to remove tag");
+    }
+  };
+  const chatUnsubRef = useRef(null);
+  const chatPollRef = useRef(null);
+  const enrichMessages = async (raw) => {
+    return Promise.all(raw.map(async (msg) => {
+      let senderName = msg.senderName || msg.sender_name || "User";
+      if (msg.role === "teacher" && msg.userId === user?.uid) senderName = "You";
+      else if (msg.role === "teacher") senderName = senderName || "Teacher";
+      else if (!senderName || senderName === "User") {
+        try {
+          const uDoc = await getDoc(doc(db, "users", msg.userId || msg.user_id));
+          if (uDoc.exists()) senderName = uDoc.data().displayName || uDoc.data().display_name || "Student";
+        } catch (_) {
+        }
+      }
+      return { ...msg, senderName };
+    }));
+  };
+  const fetchChatDirect = async (courseId) => {
+    try {
+      const { data, error } = await db.from("course_chat_messages").select("*").eq("course_id", courseId).order("created_at", { ascending: true });
+      if (!error && data) {
+        const enriched = await enrichMessages(data);
+        setCourseChatMessages(enriched);
+      }
+    } catch (_) {
+    }
+  };
+  const subscribeChat = (courseId) => {
+    if (user) {
+      markCourseRead(user.uid, courseId);
+      setUnreadCounts((prev) => ({ ...prev, [courseId]: 0 }));
+    }
+    chatUnsubRef.current?.();
+    if (chatPollRef.current) {
+      clearInterval(chatPollRef.current);
+      chatPollRef.current = null;
+    }
+    const q = query(
+      collection(db, "course_chat_messages"),
+      where("courseId", "==", courseId),
+      orderBy("createdAt", "asc")
+    );
+    const unsub = onSnapshot(q, async (snap) => {
+      const raw = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const enriched = await enrichMessages(raw);
+      setCourseChatMessages(enriched);
+    }, (e) => console.error("Chat subscription error", e));
+    chatUnsubRef.current = unsub;
+    fetchChatDirect(courseId);
+    chatPollRef.current = window.setInterval(() => fetchChatDirect(courseId), 4e3);
+  };
+  const fetchScheduledClasses = async (courseId) => {
+    try {
+      const { data, error } = await db.from("scheduled_classes").select("*").eq("course_id", courseId).order("scheduled_at", { ascending: false });
+      if (error) throw error;
+      setScheduledClasses(data || []);
+    } catch (e) {
+      console.error("Failed to load scheduled classes", e);
+    }
+  };
+  const fetchOverviewStats = async (teacherId) => {
+    try {
+      const myCourseIds = courses.map((c) => c.courseId);
+      let total = 0, fcCount = 0, fullCount = 0;
+      let earningsTotal = 0, earningsMonthly = 0;
+      const now = /* @__PURE__ */ new Date();
+      const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      if (myCourseIds.length > 0) {
+        const planMap = /* @__PURE__ */ new Map();
+        for (const cid of myCourseIds) {
+          const eSnap = await getDocs(query(collection(db, "enrollments"), where("courseId", "==", cid), where("role", "==", "student")));
+          eSnap.docs.forEach((d) => planMap.set(d.data().userId, d.data().plan || "full"));
+        }
+        const { data: enrollData } = await db.from("enrollments").select("user_id, plan, created_at").in("course_id", myCourseIds).eq("role", "student");
+        const enrollments = enrollData || [];
+        total = enrollments.length;
+        for (const e of enrollments) {
+          const plan = planMap.get(e.user_id) || e.plan || "full";
+          if (plan === "first_class") fcCount++;
+          else fullCount++;
+        }
+        for (const course of courses) {
+          const courseEnrolls = enrollments.filter((e) => e.course_id === course.courseId);
+          for (const e of courseEnrolls) {
+            const plan = planMap.get(e.user_id) || "full";
+            const amount = plan === "first_class" ? 10 : course.courseData?.price || 0;
+            const createdAt = e.created_at || "";
+            if (amount) {
+              earningsTotal += amount;
+              if (createdAt >= thisMonthStart) earningsMonthly += amount;
+            }
+          }
+        }
+      }
+      setTotalStudents(total);
+      setFirstClassStudents(fcCount);
+      setFullAccessStudents(fullCount);
+      setEarnings({ total: earningsTotal, monthly: earningsMonthly });
+      const { data: upcoming } = await db.from("scheduled_classes").select("*").eq("teacher_id", teacherId).gte("scheduled_at", (/* @__PURE__ */ new Date()).toISOString()).order("scheduled_at", { ascending: true }).limit(5);
+      setUpcomingClasses(upcoming || []);
+      const { data: recur } = await db.from("teacher_recurring_classes").select("*").eq("teacher_id", teacherId).eq("is_active", true);
+      setRecurringClasses(recur || []);
+    } catch (e) {
+      console.error("Failed to load overview stats", e);
+    }
+  };
+  const notifyAdmins = async (courseTitle, className, meetingLink, teacherName) => {
+    try {
+      const { data: adminUsers } = await db.from("users").select("*").in("email", ADMIN_EMAILS);
+      if (adminUsers) {
+        for (const admin of adminUsers) {
+          await db.from("notifications").insert({
+            user_id: admin.id,
+            title: "New Class Scheduled by Teacher",
+            message: `Teacher ${teacherName} scheduled "${className}" for course "${courseTitle}". Meeting link: ${meetingLink}`,
+            type: "class_scheduled",
+            is_read: false,
+            created_at: (/* @__PURE__ */ new Date()).toISOString()
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to notify admins", e);
+    }
+  };
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      if (!u) {
+        navigate("/login");
+        return;
+      }
+      setUser(u);
+      try {
+        const coursesSnap = await getDocs(collection(db, "courses"));
+        const coursesMap = /* @__PURE__ */ new Map();
+        coursesSnap.docs.forEach((d) => coursesMap.set(d.id, { id: d.id, ...d.data() }));
+        const tq = query(collection(db, "enrollments"), where("userId", "==", u.uid), where("role", "==", "teacher"));
+        const tSnap = await getDocs(tq);
+        const teacherCourses = [];
+        for (const ds of tSnap.docs) {
+          const data = ds.data();
+          const course = coursesMap.get(data.courseId) || (() => {
+            const idx = PLATFORM_COURSES.findIndex((_, i) => `pc-${i}` === data.courseId);
+            return idx !== -1 ? { id: `pc-${idx}`, ...PLATFORM_COURSES[idx] } : null;
+          })();
+          if (!course) continue;
+          const { count } = await db.from("enrollments").select("id", { count: "exact", head: true }).eq("course_id", data.courseId).neq("user_id", u.uid);
+          teacherCourses.push({ id: ds.id, ...data, courseData: course, studentCount: count || 0 });
+        }
+        setCourses(teacherCourses);
+        await fetchOverviewStats(u.uid);
+      } catch (err) {
+        console.error("Failed to load teacher data", err);
+        toast.error("Failed to load courses");
+      } finally {
+        setLoading(false);
+      }
+    });
+    return () => {
+      unsub();
+      chatUnsubRef.current?.();
+      if (chatPollRef.current) clearInterval(chatPollRef.current);
+    };
+  }, [navigate]);
+  useEffect(() => {
+    if (!user || courses.length === 0) return;
+    const checkUnread = async () => {
+      const timestamps = getLastReadTimestamps(user.uid);
+      const counts = {};
+      for (const course of courses) {
+        if (!course.courseId) continue;
+        const lastRead = timestamps[course.courseId];
+        try {
+          const { count } = await db.from("course_chat_messages").select("id", { count: "exact", head: true }).eq("course_id", course.courseId).gt("created_at", lastRead || "1970-01-01");
+          if (count && count > 0) counts[course.courseId] = count;
+        } catch (_) {
+        }
+      }
+      setUnreadCounts(counts);
+    };
+    checkUnread();
+    const interval = setInterval(checkUnread, 1e4);
+    return () => clearInterval(interval);
+  }, [user, courses]);
+  const toggleCourse = async (courseId) => {
+    if (expandedCourse === courseId) {
+      chatUnsubRef.current?.();
+      setExpandedCourse(null);
+      return;
+    }
+    setExpandedCourse(courseId);
+    setActiveCourseTab("modules");
+    await fetchModulesAndResources(courseId);
+    await fetchStudents(courseId);
+    await fetchScheduledClasses(courseId);
+  };
+  const switchTab = async (tab, courseId) => {
+    setActiveCourseTab(tab);
+    if (tab === "chat") subscribeChat(courseId);
+    else {
+      chatUnsubRef.current?.();
+      if (chatPollRef.current) {
+        clearInterval(chatPollRef.current);
+        chatPollRef.current = null;
+      }
+    }
+    if (tab === "students") await fetchStudents(courseId);
+    if (tab === "schedule") await fetchScheduledClasses(courseId);
+    if (tab === "modules") await fetchModulesAndResources(courseId);
+  };
+  const handleCreateModule = async (e) => {
+    e.preventDefault();
+    if (!user || !showModuleModal) return;
+    try {
+      let finalThumbUrl = "";
+      if (mThumbFile) {
+        const fileRef = ref(storage, `module_thumbnails/${Date.now()}_${mThumbFile.name}`);
+        const snap = await uploadBytes(fileRef, mThumbFile);
+        finalThumbUrl = await getDownloadURL(snap.ref);
+      }
+      await addDoc(collection(db, "course_modules"), {
+        courseId: showModuleModal,
+        teacherId: user.uid,
+        title: mTitle,
+        description: mDesc,
+        order: modules.length + 1,
+        lectures: [],
+        thumbnailUrl: finalThumbUrl || "",
+        createdAt: serverTimestamp()
+      });
+      setShowModuleModal(null);
+      setMTitle("");
+      setMDesc("");
+      setMThumbFile(null);
+      await fetchModulesAndResources(showModuleModal);
+      toast.success("Module deployed");
+    } catch (err) {
+      toast.error("Failed to create module");
+    }
+  };
+  const handleAddLecture = async (e) => {
+    e.preventDefault();
+    if (!user || !showLectureModal) return;
+    try {
+      const moduleRef = doc(db, "course_modules", showLectureModal.moduleId);
+      const newLecture = {
+        id: Date.now().toString(),
+        title: lTitle,
+        meetingLink: lMeet,
+        recordedLink: lRec,
+        createdAt: (/* @__PURE__ */ new Date()).toISOString()
+      };
+      const mod = modules.find((m) => m.id === showLectureModal.moduleId);
+      const currentLectures = mod?.lectures || [];
+      await updateDoc(moduleRef, { lectures: [...currentLectures, newLecture] });
+      setShowLectureModal(null);
+      setLTitle("");
+      setLMeet("");
+      setLRec("");
+      await fetchModulesAndResources(showLectureModal.courseId);
+      toast.success("Lecture added");
+    } catch (err) {
+      toast.error("Failed to add lecture");
+    }
+  };
+  const handleCreateResource = async (e) => {
+    e.preventDefault();
+    if (!showResourceModal) return;
+    try {
+      await addDoc(collection(db, "resources"), {
+        courseId: showResourceModal,
+        title: rTitle,
+        url: rUrl,
+        createdAt: serverTimestamp()
+      });
+      setShowResourceModal(null);
+      setRTitle("");
+      setRUrl("");
+      await fetchModulesAndResources(showResourceModal);
+      toast.success("Resource added");
+    } catch (err) {
+      toast.error("Failed to add resource");
+    }
+  };
+  const handleSendChat = async (courseId) => {
+    if (!chatInput.trim() || !user) return;
+    setSendingMessage(true);
+    try {
+      const { error } = await db.from("course_chat_messages").insert({
+        course_id: courseId,
+        user_id: user.uid,
+        content: chatInput,
+        sender_name: user.displayName || "Teacher",
+        role: "teacher",
+        created_at: (/* @__PURE__ */ new Date()).toISOString()
+      });
+      if (error) throw error;
+      setChatInput("");
+    } catch (e) {
+      toast.error("Failed to send message");
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+  const handleScheduleClass = async (courseId, courseTitle) => {
+    if (!sTitle.trim() || !sMeetLink.trim() || !user) {
+      toast.error("Title and meeting link are required");
+      return;
+    }
+    try {
+      await db.from("scheduled_classes").insert({
+        course_id: courseId,
+        teacher_id: user.uid,
+        title: sTitle,
+        description: sDesc || "",
+        meeting_link: sMeetLink,
+        scheduled_at: sDate || (/* @__PURE__ */ new Date()).toISOString(),
+        created_at: (/* @__PURE__ */ new Date()).toISOString()
+      });
+      const teacherName = user.displayName || user.email || "A teacher";
+      await notifyAdmins(courseTitle, sTitle, sMeetLink, teacherName);
+      try {
+        const { data: enrolledStudents } = await db.from("enrollments").select("user_id").eq("course_id", courseId).eq("role", "student");
+        if (enrolledStudents && enrolledStudents.length > 0) {
+          const notifInsert = enrolledStudents.map((s) => ({
+            user_id: s.user_id,
+            title: "New Class Scheduled",
+            message: `A new class "${sTitle}" has been scheduled for "${courseTitle}" on ${new Date(sDate || /* @__PURE__ */ new Date()).toLocaleDateString()}. Join link: ${sMeetLink}`,
+            type: "schedule",
+            is_read: false,
+            created_at: (/* @__PURE__ */ new Date()).toISOString()
+          }));
+          await db.from("notifications").insert(notifInsert);
+        }
+      } catch (e) {
+        console.warn("Failed to notify students", e);
+      }
+      setShowScheduleModal(false);
+      setSTitle("");
+      setSDesc("");
+      setSMeetLink("");
+      setSDate("");
+      await fetchScheduledClasses(courseId);
+      toast.success("Class scheduled! Students notified.");
+    } catch (e) {
+      toast.error("Failed to schedule class");
+    }
+  };
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Link copied to clipboard!");
+  };
+  const courseTabs = [
+    { id: "modules", label: "Modules", icon: BookOpen },
+    { id: "students", label: "Students", icon: Users },
+    { id: "chat", label: "Chat", icon: MessageSquare },
+    { id: "schedule", label: "Schedule", icon: Calendar }
+  ];
+  const getCourseTitle = () => {
+    if (!expandedCourse) return "";
+    const course = courses.find((c) => c.courseId === expandedCourse);
+    return course?.courseData?.title || "Course";
+  };
+  if (loading) {
+    return <SplashLoader />;
+  }
+  return <div className="min-h-screen pt-24 sm:pt-28 pb-24 sm:pb-32 px-4 sm:px-6 [#020617] selection:bg-purple-500/30">
+ <div className="fixed inset-0 overflow-hidden pointer-events-none"> <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-purple-500/10 blur-[60px] rounded-full" />
+ <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-500/10 blur-[60px] rounded-full" />
+ </div>
+ <div className="max-w-[1400px] mx-auto relative z-10"> <Link to="/dashboard" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors text-sm font-bold mb-8 group"> <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+ Back to Dashboard
+ </Link>
+
+ <header className="mb-8"> <div className="flex items-center gap-3 mb-4">
+ <span className="px-4 py-1.5 bg-purple-500/10 text-purple-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-500/20">
+ Teacher Console
+ </span>
+ </div>
+ <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+ <div>
+ <h1 className="text-[2rem] sm:text-4xl md:text-6xl font-black text-slate-900 tracking-tighter leading-none mb-2"> {viewMode === "overview" ? "Dashboard" : <>My <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-indigo-500">Courses</span></>}
+ </h1>
+ <p className="text-sm sm:text-lg text-slate-500 font-medium max-w-xl"> {viewMode === "overview" ? "Your teaching at a glance." : "Manage your courses, students, chat, and schedule live classes."}
+ </p>
+ </div>
+ <div className="flex gap-2 w-full sm:w-auto"> <button onClick={() => setViewMode("overview")} className={`flex-1 sm:flex-initial px-5 py-3 rounded-2xl font-bold text-sm transition-colors ${viewMode === "overview" ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+ <BarChart3 className="w-4 h-4 inline mr-2" />Overview
+ </button>
+ <button onClick={() => setViewMode("courses")} className={`flex-1 sm:flex-initial px-5 py-3 rounded-2xl font-bold text-sm transition-colors ${viewMode === "courses" ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20" : "bg-slate-100 text-slate-500 hover:bg-slate-200"}`}>
+ <BookOpen className="w-4 h-4 inline mr-2" />Courses
+ </button>
+ </div>
+ </div>
+ </header>
+
+ {viewMode === "overview" && <div className="space-y-8">
+ {
+    /* Stats cards */
+  }
+  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4"> <div className="p-4 sm:p-5 rounded-[1.25rem] sm:rounded-[1.5rem] border border-slate-200 shadow-sm">
+   <Users className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500 mb-2" /> <p className="text-xl sm:text-2xl font-black text-slate-900 ">{totalStudents}</p>
+  <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">Total Students</p>
+  </div>
+   <div className="p-4 sm:p-5 rounded-[1.25rem] sm:rounded-[1.5rem] border border-slate-200 shadow-sm"> <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-500 mb-2" />
+   <p className="text-xl sm:text-2xl font-black text-slate-900 ">{courses.length}</p> <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">Courses</p>
+  </div>
+   <div className="p-4 sm:p-5 rounded-[1.25rem] sm:rounded-[1.5rem] border border-slate-200 shadow-sm"> <Users className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 mb-2" />
+   <p className="text-xl sm:text-2xl font-black text-slate-900 ">{firstClassStudents}</p> <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">First Class</p>
+  </div>
+   <div className="p-4 sm:p-5 rounded-[1.25rem] sm:rounded-[1.5rem] border border-slate-200 shadow-sm"> <Users className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 mb-2" />
+   <p className="text-xl sm:text-2xl font-black text-slate-900 ">{fullAccessStudents}</p> <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">Full Access</p>
+  </div>
+   <div className="p-4 sm:p-5 rounded-[1.25rem] sm:rounded-[1.5rem] border border-slate-200 shadow-sm"> <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 mb-2" />
+   <p className="text-xl sm:text-2xl font-black text-slate-900 ">₹{earnings.monthly.toLocaleString()}</p> <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">Monthly Earnings</p>
+  </div>
+   <div className="p-4 sm:p-5 rounded-[1.25rem] sm:rounded-[1.5rem] border border-slate-200 shadow-sm"> <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 mb-2" />
+   <p className="text-xl sm:text-2xl font-black text-slate-900 ">{upcomingClasses.length}</p> <p className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest mt-0.5">Upcoming Classes</p>
+  </div>
+  </div>
+
+ {
+    /* Total earnings & Upcoming classes */
+  }
+ <div className="grid grid-cols-1 lg:grid-cols-2 gap-6"> <div className="p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-slate-200 shadow-sm">
+  <h3 className="font-black text-lg mb-4 flex items-center gap-2"><DollarSign className="w-5 h-5 text-amber-500" /> Total Earnings</h3> <p className="text-3xl sm:text-4xl font-black text-slate-900 ">₹{earnings.total.toLocaleString()}</p>
+ <p className="text-xs text-slate-400 font-medium mt-1">Lifetime earnings from all courses</p>
+ </div>
+  <div className="p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-slate-200 shadow-sm"> <h3 className="font-black text-lg mb-4 flex items-center gap-2"><Calendar className="w-5 h-5 text-blue-500" /> Upcoming Classes</h3> {upcomingClasses.length === 0 ? <p className="text-slate-400 font-medium text-sm py-6">No upcoming classes scheduled.</p> : <div className="space-y-3"> {upcomingClasses.map((c) => <div key={c.id} className="flex items-center justify-between p-3  rounded-xl">
+ <div>
+ <p className="font-bold text-sm text-slate-900 ">{c.title}</p> <p className="text-xs text-slate-400">{c.scheduled_at ? new Date(c.scheduled_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "No date"}</p>
+ </div>
+ <div className="flex gap-2"> <a href={c.meeting_link} target="_blank" rel="noreferrer" className="px-4 py-2 bg-emerald-500 text-white font-bold rounded-xl text-xs hover:bg-emerald-600 transition-colors">Join</a> <button onClick={() => copyToClipboard(c.meeting_link)} className="p-2 bg-slate-200 rounded-xl hover:bg-slate-300 transition-colors"><Copy className="w-4 h-4" /></button>
+ </div>
+ </div>)}
+ </div>}
+ </div>
+ </div>
+
+ {
+    /* Recurring classes */
+  }
+ <div className="p-6 rounded-[2rem] border border-slate-200 shadow-sm"> <h3 className="font-black text-lg mb-4 flex items-center gap-2"><Repeat className="w-5 h-5 text-purple-500" /> Recurring / Daily Classes</h3> {recurringClasses.length === 0 ? <p className="text-slate-400 font-medium text-sm py-6">No recurring classes. Switch to Courses tab to create one.</p> : <div className="space-y-3"> {recurringClasses.map((rc) => <div key={rc.id} className="flex items-center justify-between p-3 sm:p-4  rounded-2xl border border-slate-200">
+ <div className="flex-1"> <div className="flex items-center gap-2 mb-1">
+ <span className="px-2 py-0.5 bg-purple-100 text-purple-600 rounded-lg text-[10px] font-bold uppercase">{rc.repeat_type}</span> <p className="font-bold text-slate-900 ">{rc.title}</p>
+ </div>
+ {rc.description && <p className="text-xs text-slate-500">{rc.description}</p>} <p className="text-xs text-slate-400 font-medium mt-1">{rc.start_time ? new Date(rc.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Anytime"} {rc.end_time ? `- ${new Date(rc.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}</p>
+ </div>
+ <div className="flex gap-2 shrink-0 ml-4"> <a href={rc.meeting_link} target="_blank" rel="noreferrer" className="px-4 py-2.5 bg-emerald-500 text-white font-bold rounded-xl text-xs hover:bg-emerald-600 transition-colors">Join</a> <button onClick={() => copyToClipboard(rc.meeting_link)} className="p-2.5 bg-slate-200 rounded-xl hover:bg-slate-300 transition-colors"><Copy className="w-4 h-4" /></button>
+ </div>
+ </div>)}
+ </div>}
+ </div>
+ </div>}
+
+ {viewMode === "courses" && (courses.length === 0 ? <div className="text-center py-24 rounded-[3rem] border-2 border-dashed border-slate-200 ">
+ <GraduationCap className="w-16 h-16 text-slate-300 mx-auto mb-6" /> <h3 className="text-2xl font-black text-slate-400">No Teaching Courses Yet</h3>
+ <p className="text-slate-500 font-medium mt-2">Once an admin approves your mentor application, your courses will appear here.</p> </div> : <div className="space-y-6">
+ {courses.map((course, idx) => <motion.div
+    key={course.id}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: idx * 0.05 }}
+    className="rounded-[2.5rem] border border-slate-200 overflow-hidden shadow-sm"
+  >
+ <button onClick={() => toggleCourse(course.courseId)} className="w-full p-5 sm:p-8 flex items-center justify-between hover: transition-colors text-left"> <div className="flex-1">
+ <div className="flex items-center gap-3 mb-2"> <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-[10px] font-bold uppercase tracking-wider">Teacher</span>
+  <span className="flex items-center gap-1.5 text-sm font-bold text-slate-500"> <Users className="w-4 h-4" /> {course.studentCount} enrolled
+  </span>
+    {(unreadCounts[course.courseId] ?? 0) > 0 && <span className="ml-2 px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-black rounded-full">
+    {unreadCounts[course.courseId]} new
+  </span>}
+  </div>
+  <h3 className="text-xl sm:text-2xl font-black text-slate-900 ">{course.courseData?.title || "Unknown Course"}</h3> <p className="text-slate-500 font-medium mt-1 line-clamp-1">{course.courseData?.description}</p>
+  </div>
+  <div className="flex items-center gap-3 shrink-0 ml-6"> <Link to={`/classroom/${course.courseId}`} onClick={(e) => e.stopPropagation()} className="px-5 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-2xl transition-colors text-sm">
+  Open Classroom
+  </Link>
+ <div className={`w-3 h-3 rounded-full transition-transform ${expandedCourse === course.courseId ? "rotate-180" : ""}`}>
+ <svg viewBox="0 0 24 24" className="w-3 h-3 fill-slate-400"><path d="M7 10l5 5 5-5z" /></svg>
+ </div>
+ </div>
+ </button>
+
+ <AnimatePresence mode="wait">
+  {expandedCourse === course.courseId && <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden will-change-transform"> <div className="px-5 sm:px-8 pb-5 sm:pb-8 border-t border-slate-100 ">
+ {
+    /* Course Tabs */
+  }
+ <div className="flex gap-1 -mx-5 sm:-mx-8 px-5 sm:px-8 pt-4 pb-2 border-b border-slate-100 mb-6 overflow-x-auto">
+  {courseTabs.map((tab) => <button
+    key={tab.id}
+    onClick={() => switchTab(tab.id, course.courseId)}
+    className={`flex items-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-colors whitespace-nowrap ${activeCourseTab === tab.id ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20" : "text-slate-500 hover:bg-slate-100"}`}
+  >
+  <tab.icon className="w-4 h-4" />
+  {tab.label}
+    {tab.id === "chat" && (unreadCounts[course.courseId] ?? 0) > 0 && activeCourseTab !== "chat" && <span className="ml-1 px-1.5 py-0.5 bg-emerald-500 text-white text-[9px] font-black rounded-full min-w-[18px] text-center">
+    {course.courseId && unreadCounts[course.courseId]}
+  </span>}
+  </button>)}
+ </div>
+
+ {
+    /* Tab Content */
+  }
+ {activeCourseTab === "modules" && <div className="space-y-8">
+ {
+    /* Quick Actions */
+  }
+ <div className="flex flex-wrap gap-3"> <button onClick={() => setShowModuleModal(course.courseId)} className="flex items-center gap-2 px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl transition-colors text-sm">
+ <Plus className="w-4 h-4" /> New Module
+ </button>
+ <button onClick={() => setShowResourceModal(course.courseId)} className="flex items-center gap-2 px-5 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-2xl transition-colors text-sm"> <FileText className="w-4 h-4" /> Add Resource
+ </button>
+ </div>
+
+ {loadingModules ? <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-purple-500" /></div> : <>
+ <div>
+ <h4 className="text-lg font-black text-slate-900 mb-4 flex items-center gap-2"> <BookOpen className="w-5 h-5 text-purple-500" /> Modules ({modules.length})
+ </h4>
+ {modules.length === 0 ? <p className="text-slate-400 font-medium text-sm py-6 text-center rounded-2xl">No modules yet. Create your first module to start building the curriculum.</p> : <div className="space-y-3"> {modules.map((mod) => <div key={mod.id} className="rounded-2xl p-4 sm:p-5 border border-slate-200">
+ <div className="flex items-start justify-between gap-4"> <div className="flex-1">
+ <h5 className="font-bold text-slate-900 ">{mod.title}</h5> {mod.description && <p className="text-sm text-slate-500 mt-1">{mod.description}</p>}
+ <p className="text-xs text-slate-400 font-medium mt-2">{mod.lectures?.length || 0} lectures</p>
+ </div>
+ <button onClick={() => setShowLectureModal({ courseId: course.courseId, moduleId: mod.id })} className="flex items-center gap-2 px-4 py-2 bg-purple-500/10 text-purple-600 hover:bg-purple-500 hover:text-white font-bold rounded-xl transition-colors text-xs"> <Video className="w-3.5 h-3.5" /> Add Lecture
+ </button>
+ </div>
+ {mod.lectures && mod.lectures.length > 0 && <div className="mt-4 space-y-2 pl-4 border-l-2 border-purple-200 "> {mod.lectures.map((lec) => <div key={lec.id} className="flex items-center gap-3 text-sm">
+ <span className="w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0" /> <span className="font-medium text-slate-700 flex-1">{lec.title}</span>
+ {lec.meetingLink && <a href={lec.meetingLink} target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-600"> <Video className="w-4 h-4" />
+ </a>}
+ {lec.recordedLink && <a href={lec.recordedLink} target="_blank" rel="noreferrer" className="text-emerald-500 hover:text-emerald-600"> <ExternalLink className="w-4 h-4" />
+ </a>}
+ </div>)}
+ </div>}
+ </div>)}
+ </div>}
+ </div>
+
+ <div>
+ <h4 className="text-lg font-black text-slate-900 mb-4 flex items-center gap-2"> <FileText className="w-5 h-5 text-blue-500" /> Resources ({resources.length})
+ </h4>
+ {resources.length === 0 ? <p className="text-slate-400 font-medium text-sm py-6 text-center rounded-2xl">No resources yet.</p> : <div className="grid grid-cols-1 sm:grid-cols-2 gap-3"> {resources.map((r) => <div key={r.id} className="flex items-center gap-3 p-3 sm:p-4  rounded-2xl border border-slate-200">
+ <FileText className="w-5 h-5 text-blue-500 shrink-0" /> <div className="flex-1 min-w-0">
+ <p className="font-bold text-sm text-slate-900 truncate">{r.title}</p>
+ </div>
+ <a href={r.url} target="_blank" rel="noreferrer" className="p-2 bg-blue-500/10 text-blue-500 hover:bg-blue-500 hover:text-white rounded-xl transition-colors"> <ExternalLink className="w-4 h-4" />
+ </a>
+ </div>)}
+ </div>}
+ </div>
+ </>}
+ </div>}
+
+ {
+    /* Students Tab */
+  }
+ {activeCourseTab === "students" && <div>
+ <h4 className="text-lg font-black text-slate-900 mb-4 flex items-center gap-2"> <Users className="w-5 h-5 text-purple-500" /> Enrolled Students ({students.length})
+ </h4>
+ {loadingStudents ? <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-purple-500" /></div> : students.length === 0 ? <p className="text-slate-400 font-medium text-sm py-12 text-center rounded-2xl">No students enrolled yet.</p> : <div className="space-y-8"> {["first_class", "full"].map((plan) => {
+    const label = plan === "first_class" ? "First Class" : "Full Access";
+    const planStudents = students.filter((s) => (s.plan || "first_class") === plan);
+    if (planStudents.length === 0) return null;
+    const planColor = plan === "full" ? "text-emerald-600" : "text-amber-600";
+    return <div key={plan}>
+    <div className="flex items-center gap-2 mb-3">
+     <span className={`text-[10px] font-black uppercase tracking-widest ${planColor}`}>{label}</span>
+     <span className="text-[9px] text-slate-400 font-medium">({planStudents.length})</span>
+    </div>
+    <div className="space-y-3">
+   {planStudents.map((s) => {
+      const avatarGrad = s.blocked ? "from-red-300 to-red-400" : plan === "full" ? "from-emerald-400 to-emerald-500" : plan === "first_class" ? "from-amber-400 to-amber-500" : "from-blue-400 to-blue-500";
+      return <div key={s.id} className={`flex items-start gap-4 p-4 sm:p-5 rounded-2xl border border-slate-200/50 transition-colors ${s.blocked ? "bg-red-50/40 opacity-60" : "bg-slate-50/30"}`}>
+   <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${avatarGrad} flex items-center justify-center font-black text-white text-lg shrink-0`}>
+   {s.name.charAt(0).toUpperCase()}
+   </div>
+    <div className="flex-1 min-w-0"> <p className="font-bold text-slate-900 truncate">{s.name}</p>
+      <p className="text-xs text-slate-400 font-medium truncate">{s.email}</p> <div className="flex items-center gap-2 mt-1 flex-wrap">
+        {s.created_at && <span className="text-[9px] text-slate-400 font-medium">Joined {new Date(s.created_at).toLocaleDateString()}</span>} {s.blocked && <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-[9px] font-bold uppercase tracking-wider">Blocked</span>}
+      </div>
+      {
+        /* Tags */
+      }
+      <div className="flex items-center gap-1.5 mt-2 flex-wrap"> {(s.tags || []).map((tag) => <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-[9px] font-semibold">
+            {tag}
+            <button onClick={() => handleRemoveTag(s.id, tag)} className="hover:text-red-600">&times;</button>
+          </span>)}
+        <span className="relative inline-flex">
+          <input
+        value={tagInputs[s.id] || ""}
+        onChange={(e) => setTagInputs((prev) => ({ ...prev, [s.id]: e.target.value }))}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleAddTag(s.id);
+          }
+        }}
+        placeholder="+ tag"
+        className="w-16 text-[9px] px-1.5 py-0.5 bg-transparent border-b border-purple-300 outline-none text-purple-800 placeholder-purple-300"
+      />
+        </span>
+      </div>
+    </div>
+    <div className="flex flex-col items-end gap-1.5 shrink-0"> {s.plan === "first_class" ? <button className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-[10px] transition-colors whitespace-nowrap">
+          Upgrade
+        </button> : null}
+      <span className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${s.student_status === "active" && !s.blocked ? "bg-emerald-100/30 text-emerald-600" : "bg-slate-100 text-slate-500"}`}>
+       {s.blocked ? "blocked" : s.student_status || "active"}
+      </span>
+      {s.blocked ? <button onClick={() => handleUnblockStudent(s.id)} className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white font-bold rounded-lg text-[9px] transition-colors whitespace-nowrap">
+        Unblock
+      </button> : <button onClick={() => handleBlockStudent(s.id)} className="px-3 py-1 bg-slate-300 hover:bg-slate-400 text-white font-bold rounded-lg text-[9px] transition-colors whitespace-nowrap">
+        Block
+      </button>}
+    </div>
+   </div>;
+    })}
+    </div>
+   </div>;
+  })}
+  </div>}
+ </div>}
+
+ {
+    /* Chat Tab */
+  }
+ {activeCourseTab === "chat" && <div className="flex flex-col h-[500px] rounded-2xl border border-slate-200 overflow-hidden">
+ <div className="p-4 border-b border-slate-200"> <h4 className="font-black text-sm flex items-center gap-2">
+ <MessageSquare className="w-4 h-4 text-purple-500" />
+ Course Chat — Students & Teacher
+ </h4>
+ </div>
+ <div className="flex-1 overflow-y-auto p-4 space-y-3"> {courseChatMessages.length === 0 ? <div className="text-center py-16">
+ <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-3" /> <p className="text-sm font-medium text-slate-400">No messages yet</p>
+ <p className="text-xs text-slate-500 mt-1">Start the conversation with your students</p> </div> : courseChatMessages.map((msg) => <div key={msg.id} className={`flex ${msg.role === "teacher" && msg.user_id === user?.uid ? "justify-end" : "justify-start"}`}>
+ <div className={`max-w-[75%] p-4 rounded-2xl ${msg.role === "teacher" && msg.user_id === user?.uid ? "bg-purple-500 text-white rounded-br-md" : "bg-white text-slate-900 rounded-bl-md border border-slate-200"}`}>
+ <p className="text-xs font-bold opacity-70 mb-1">{msg.senderName}</p> <p className="text-sm font-medium leading-relaxed">{msg.content}</p>
+ <p className={`text-[10px] mt-1 ${msg.role === "teacher" && msg.user_id === user?.uid ? "text-purple-200" : "text-slate-400"}`}>
+ {new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+ </p>
+ </div>
+ </div>)}
+ </div>
+ <div className="p-4 border-t border-slate-200"> <div className="flex gap-3">
+ <input
+    value={chatInput}
+    onChange={(e) => setChatInput(e.target.value)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSendChat(course.courseId);
+      }
+    }}
+    placeholder="Type a message to students..."
+    className="flex-1 p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-purple-500 transition-colors text-sm"
+  />
+ <button
+    onClick={() => handleSendChat(course.courseId)}
+    disabled={sendingMessage || !chatInput.trim()}
+    className="px-6 bg-purple-500 hover:bg-purple-600 text-white font-black rounded-2xl transition-colors disabled:opacity-50 flex items-center gap-2"
+  >
+ {sendingMessage ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+ </button>
+ </div>
+ </div>
+ </div>}
+
+ {
+    /* Schedule Tab */
+  }
+ {activeCourseTab === "schedule" && <div>
+ <div className="flex items-center justify-between mb-6"> <h4 className="text-lg font-black text-slate-900 flex items-center gap-2">
+ <Calendar className="w-5 h-5 text-purple-500" /> Scheduled Classes
+ </h4>
+ <button onClick={() => setShowScheduleModal(true)} className="flex items-center gap-2 px-5 py-3 bg-purple-500 hover:bg-purple-600 text-white font-bold rounded-2xl transition-colors text-sm"> <Plus className="w-4 h-4" /> Schedule Class
+ </button>
+ </div>
+
+ {scheduledClasses.length === 0 ? <p className="text-slate-400 font-medium text-sm py-12 text-center rounded-2xl">No classes scheduled yet.</p> : <div className="space-y-3"> {scheduledClasses.map((sc) => <div key={sc.id} className="flex items-center gap-4 p-5  rounded-2xl border border-slate-200">
+ <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-black text-white shrink-0"> <Calendar className="w-5 h-5" />
+ </div>
+ <div className="flex-1 min-w-0"> <p className="font-bold text-slate-900 ">{sc.title}</p>
+ {sc.description && <p className="text-xs text-slate-500 mt-0.5">{sc.description}</p>} <p className="text-xs text-slate-400 font-medium mt-1">
+ {sc.scheduled_at ? new Date(sc.scheduled_at).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "No date set"}
+ </p>
+ </div>
+ <a href={sc.meeting_link} target="_blank" rel="noreferrer" className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl transition-colors text-xs flex items-center gap-1.5 shrink-0"> <Video className="w-3.5 h-3.5" /> Join
+ </a>
+ </div>)}
+ </div>}
+ </div>}
+ </div>
+ </motion.div>}
+ </AnimatePresence>
+ </motion.div>)}
+ </div>)}
+ </div>
+
+ {
+    /* Module Modal */
+  }
+ <AnimatePresence>
+ {showModuleModal && <div className="fixed inset-0 z-[100] flex items-center justify-center p-6"> <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowModuleModal(null)} className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" />
+  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="relative w-full max-w-lg rounded-[2.5rem] border border-slate-200 shadow-2xl p-6 sm:p-8">
+  <div className="flex justify-between items-center mb-6"> <h3 className="text-2xl font-black">New Module</h3>
+ <button onClick={() => setShowModuleModal(null)} className="p-2 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"><X className="w-5 h-5" /></button>
+ </div>
+ <form onSubmit={handleCreateModule} className="space-y-5">
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Title</label> <input value={mTitle} onChange={(e) => setMTitle(e.target.value)} required placeholder="e.g. Introduction to the Course" className="w-full p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-emerald-500 transition-colors" />
+ </div>
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Description</label> <textarea value={mDesc} onChange={(e) => setMDesc(e.target.value)} rows={3} placeholder="Brief overview of this module" className="w-full p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-emerald-500 transition-colors resize-none" />
+ </div>
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Thumbnail (optional)</label> <input type="file" accept="image/*" onChange={(e) => setMThumbFile(e.target.files?.[0] || null)} className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-emerald-50 file:text-emerald-600 hover:file:bg-emerald-100" />
+ </div>
+ <button type="submit" className="w-full py-4 bg-emerald-500 text-white font-black rounded-2xl hover:bg-emerald-600 transition-colors">Create Module</button>
+ </form>
+ </motion.div>
+ </div>}
+ </AnimatePresence>
+
+ {
+    /* Lecture Modal */
+  }
+ <AnimatePresence>
+ {showLectureModal && <div className="fixed inset-0 z-[100] flex items-center justify-center p-6"> <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowLectureModal(null)} className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" />
+  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="relative w-full max-w-lg rounded-[2.5rem] border border-slate-200 shadow-2xl p-6 sm:p-8">
+  <div className="flex justify-between items-center mb-6"> <h3 className="text-2xl font-black">New Lecture</h3>
+ <button onClick={() => setShowLectureModal(null)} className="p-2 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"><X className="w-5 h-5" /></button>
+ </div>
+ <form onSubmit={handleAddLecture} className="space-y-5">
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Title</label> <input value={lTitle} onChange={(e) => setLTitle(e.target.value)} required placeholder="e.g. Live Session 1" className="w-full p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-emerald-500 transition-colors" />
+ </div>
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Meeting Link (for live classes)</label> <input value={lMeet} onChange={(e) => setLMeet(e.target.value)} placeholder="https://meet.google.com/..." className="w-full p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-emerald-500 transition-colors" />
+ </div>
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Recorded Link (optional)</label> <input value={lRec} onChange={(e) => setLRec(e.target.value)} placeholder="https://youtube.com/..." className="w-full p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-emerald-500 transition-colors" />
+ </div>
+ <button type="submit" className="w-full py-4 bg-purple-500 text-white font-black rounded-2xl hover:bg-purple-600 transition-colors">Add Lecture</button>
+ </form>
+ </motion.div>
+ </div>}
+ </AnimatePresence>
+
+ {
+    /* Resource Modal */
+  }
+ <AnimatePresence>
+ {showResourceModal && <div className="fixed inset-0 z-[100] flex items-center justify-center p-6"> <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowResourceModal(null)} className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" />
+  <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="relative w-full max-w-lg rounded-[2.5rem] border border-slate-200 shadow-2xl p-6 sm:p-8">
+  <div className="flex justify-between items-center mb-6"> <h3 className="text-2xl font-black">Add Resource</h3>
+ <button onClick={() => setShowResourceModal(null)} className="p-2 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"><X className="w-5 h-5" /></button>
+ </div>
+ <form onSubmit={handleCreateResource} className="space-y-5">
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Title</label> <input value={rTitle} onChange={(e) => setRTitle(e.target.value)} required placeholder="e.g. Course Notes PDF" className="w-full p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-emerald-500 transition-colors" />
+ </div>
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">URL</label> <input value={rUrl} onChange={(e) => setRUrl(e.target.value)} required placeholder="https://..." className="w-full p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-emerald-500 transition-colors" />
+ </div>
+ <button type="submit" className="w-full py-4 bg-blue-500 text-white font-black rounded-2xl hover:bg-blue-600 transition-colors">Add Resource</button>
+ </form>
+ </motion.div>
+ </div>}
+ </AnimatePresence>
+
+ {
+    /* Schedule Class Modal */
+  }
+ <AnimatePresence>
+ {showScheduleModal && <div className="fixed inset-0 z-[100] flex items-center justify-center p-6"> <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowScheduleModal(false)} className="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" />
+ <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="relative w-full max-w-lg rounded-[2.5rem] border border-slate-200 shadow-2xl p-8">
+ <div className="flex justify-between items-center mb-6"> <h3 className="text-2xl font-black">Schedule a Class</h3>
+ <button onClick={() => setShowScheduleModal(false)} className="p-2 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors"><X className="w-5 h-5" /></button>
+ </div>
+ <div className="space-y-5">
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Class Title</label> <input value={sTitle} onChange={(e) => setSTitle(e.target.value)} required placeholder="e.g. Live Q&A Session" className="w-full p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-purple-500 transition-colors" />
+ </div>
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Description (optional)</label> <textarea value={sDesc} onChange={(e) => setSDesc(e.target.value)} rows={2} placeholder="What is this class about?" className="w-full p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-purple-500 transition-colors resize-none" />
+ </div>
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Meeting Link</label> <input value={sMeetLink} onChange={(e) => setSMeetLink(e.target.value)} required placeholder="https://meet.google.com/..." className="w-full p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-purple-500 transition-colors" />
+ </div>
+ <div>
+ <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Scheduled Date & Time</label> <input value={sDate} onChange={(e) => setSDate(e.target.value)} type="datetime-local" className="w-full p-4 rounded-2xl outline-none font-bold border border-transparent focus:border-purple-500 transition-colors" />
+ </div>
+ <button onClick={() => handleScheduleClass(expandedCourse, getCourseTitle())} className="w-full py-4 bg-purple-500 text-white font-black rounded-2xl hover:bg-purple-600 transition-colors">
+ Schedule Class & Notify Admin
+ </button>
+ </div>
+ </motion.div>
+ </div>}
+ </AnimatePresence>
+ </div>;
+};
+var stdin_default = TeacherPanel;
+export {
+  stdin_default as default
+};

@@ -1,0 +1,201 @@
+function getThumbnail(title, folder) {
+  const seed = encodeURIComponent((title || folder || "course").replace(/\s+/g, "-").toLowerCase().slice(0, 50));
+  return `https://picsum.photos/seed/${seed}/400/225`;
+}
+const PLATFORM_COURSES = [
+  {
+    title: "AI Fundamentals & Prompt Engineering",
+    description: "Master the core concepts of Artificial Intelligence including machine learning basics, neural networks, and prompt engineering techniques. Learn to craft effective prompts for ChatGPT, Claude, Gemini and other AI models. Hands-on projects with real-world AI tools. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "alternative",
+    price: 699,
+    thumbnailUrl: "https://drive.google.com/uc?export=view&id=1f7-M_N6KxlaNdR2TdD3Z5aay2gF50NDO",
+    folder: "Artificial Intelligence",
+    duration: "6 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "Web Development Fundamentals",
+    description: "Build a strong foundation in web development covering HTML5, CSS3, JavaScript, responsive design, and basic backend concepts. Create your own portfolio website and dynamic web applications from scratch. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "alternative",
+    price: 899,
+    thumbnailUrl: getThumbnail("Web Development Fundamentals", "Technology"),
+    folder: "Technology",
+    duration: "8 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "Digital Marketing Essentials",
+    description: "Learn the complete digital marketing ecosystem including SEO, social media marketing, Google Ads, content marketing, email campaigns, and analytics. Practical training with live campaigns and real budget management. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "alternative",
+    price: 699,
+    thumbnailUrl: getThumbnail("Digital Marketing Essentials", "Marketing"),
+    folder: "Marketing",
+    duration: "6 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "Entrepreneurship & Startup Basics",
+    description: "Turn your business idea into reality. Learn ideation, business model canvas, MVP development, customer discovery, fundraising, pitch deck creation, and growth strategies. Interactive sessions with successful founders and investors. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "alternative",
+    price: 699,
+    thumbnailUrl: getThumbnail("Entrepreneurship & Startup Basics", "Entrepreneurship"),
+    folder: "Entrepreneurship",
+    duration: "6 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "Communication & Public Speaking",
+    description: "Develop confident communication skills including public speaking, presentation techniques, body language, voice modulation, storytelling, and debate skills. Overcome stage fear and become a persuasive communicator. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "education",
+    price: 599,
+    thumbnailUrl: getThumbnail("Communication & Public Speaking", "Career Development"),
+    folder: "Career Development",
+    duration: "4 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "UI/UX Design with Figma",
+    description: "Master user interface and user experience design using Figma. Learn design thinking, wireframing, prototyping, design systems, user research, and usability testing. Build a professional design portfolio with real-world projects. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "alternative",
+    price: 899,
+    thumbnailUrl: getThumbnail("UI/UX Design with Figma", "Design"),
+    folder: "Design",
+    duration: "8 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "Financial Literacy for Students",
+    description: "Build smart money habits early. Learn budgeting, savings, investments, stock market basics, mutual funds, taxation, banking, and financial planning. Practical knowledge to manage personal finances and build wealth. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "education",
+    price: 599,
+    thumbnailUrl: getThumbnail("Financial Literacy for Students", "Finance"),
+    folder: "Finance",
+    duration: "4 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "Advanced Mathematics Mastery",
+    description: "Comprehensive mathematics program covering algebra, calculus, trigonometry, coordinate geometry, probability, statistics, and mathematical reasoning. Problem-solving techniques and shortcut methods for competitive exams. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "education",
+    price: 699,
+    thumbnailUrl: getThumbnail("Advanced Mathematics Mastery", "Core Education"),
+    folder: "Core Education",
+    duration: "8 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "Physics Excellence Program",
+    description: "In-depth physics curriculum covering mechanics, thermodynamics, electromagnetism, optics, waves, and modern physics. Conceptual learning with numerical problem-solving, experiments, and real-world applications. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "education",
+    price: 699,
+    thumbnailUrl: getThumbnail("Physics Excellence Program", "Core Education"),
+    folder: "Core Education",
+    duration: "8 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "Carnatic Music Fundamentals",
+    description: "Learn the rich tradition of Carnatic music including swaras, ragas, talas, basic compositions, and vocal techniques. Understand the theoretical foundations and practice with guided sessions from experienced teachers. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "education",
+    price: 899,
+    thumbnailUrl: getThumbnail("Carnatic Music Fundamentals", "Music"),
+    folder: "Music",
+    duration: "8 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "Classical Dance (Kuchipudi/Bharatanatyam) Basics",
+    description: "Discover the beauty of Indian classical dance forms - Kuchipudi and Bharatanatyam. Learn basic postures, mudras, footwork, expressions, and traditional repertoire. Develop grace, rhythm, and cultural appreciation. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "education",
+    price: 999,
+    thumbnailUrl: getThumbnail("Classical Dance Kuchipudi Bharatanatyam", "Dance"),
+    folder: "Dance",
+    duration: "12 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "Creative Arts & Digital Content Creation",
+    description: "Unleash your creativity with drawing, painting, digital art, photography, video editing, and content creation for social media. Learn tools like Canva, Adobe Photoshop, CapCut, and DaVinci Resolve. Build your creative portfolio. Certificate provided upon completion. Demo class available for all ages before enrollment.",
+    category: "education",
+    price: 799,
+    thumbnailUrl: getThumbnail("Creative Arts & Digital Content Creation", "Arts & Creativity"),
+    folder: "Arts & Creativity",
+    duration: "8 weeks",
+    level: "Beginner-Adv",
+    classLevel: "All Ages",
+    comingSoon: false
+  },
+  {
+    title: "Mathematics for JEE Mains & NEET",
+    description: "Complete mathematics preparation for JEE Mains and NEET exams. Covering algebra, calculus, coordinate geometry, vectors, trigonometry, probability, and statistics. Includes previous year question papers, mock tests, shortcut techniques, and doubt-clearing sessions. Expert faculty with IIT/NIT background. Regular assessments and performance tracking. Certificate provided upon completion. Demo class available before enrollment.",
+    category: "education",
+    price: 1299,
+    thumbnailUrl: getThumbnail("Mathematics JEE Mains NEET", "Core Education"),
+    folder: "Core Education",
+    duration: "6 months",
+    level: "Advanced",
+    classLevel: "Class 11-12",
+    comingSoon: false
+  },
+  {
+    title: "Physics for JEE Mains & NEET",
+    description: "Intensive physics program for JEE Mains and NEET aspirants. Comprehensive coverage of mechanics, electromagnetism, optics, thermodynamics, modern physics, and experimental physics. Concept-based learning with numerical practice, previous year papers, full-length mock tests, and personalized doubt resolution. Expert guidance from experienced faculty. Certificate provided upon completion. Demo class available before enrollment.",
+    category: "education",
+    price: 1299,
+    thumbnailUrl: getThumbnail("Physics JEE Mains NEET", "Core Education"),
+    folder: "Core Education",
+    duration: "6 months",
+    level: "Advanced",
+    classLevel: "Class 11-12",
+    comingSoon: false
+  },
+  {
+    title: "Chemistry for JEE Mains & NEET",
+    description: "Complete chemistry syllabus for JEE Mains and NEET covering physical chemistry, organic chemistry, inorganic chemistry, and analytical chemistry. Includes chemical bonding, thermodynamics, organic reactions, periodic properties, coordination compounds, and biomolecules. Regular practice with numerical problems, reaction mechanisms, mock tests, and previous year question analysis. Certificate provided upon completion. Demo class available before enrollment.",
+    category: "education",
+    price: 1299,
+    thumbnailUrl: getThumbnail("Chemistry JEE Mains NEET", "Core Education"),
+    folder: "Core Education",
+    duration: "6 months",
+    level: "Advanced",
+    classLevel: "Class 11-12",
+    comingSoon: false
+  },
+  {
+    title: "Biology for NEET",
+    description: "Exhaustive biology program tailored for NEET exam covering botany and zoology. Topics include cell biology, genetics, evolution, human physiology, plant physiology, ecology, biotechnology, and biodiversity. Visual learning with diagrams, 3D models, and animations. Regular mock tests, previous year paper analysis, and personalized mentoring. Certificate provided upon completion. Demo class available before enrollment.",
+    category: "education",
+    price: 1299,
+    thumbnailUrl: getThumbnail("Biology NEET", "Core Education"),
+    folder: "Core Education",
+    duration: "6 months",
+    level: "Advanced",
+    classLevel: "Class 11-12",
+    comingSoon: false
+  }
+];
+export {
+  PLATFORM_COURSES
+};

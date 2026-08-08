@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://checkout.razorpay.com https://cdn.razorpay.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://openrouter.ai https://zcfdapjacuwzujlvfcri.supabase.co https://www.googleapis.com; frame-src https://checkout.razorpay.com https://api.razorpay.com; object-src 'none'; base-uri 'self'; form-action 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <title>EduAltTech | Alternative Education & Mentor-Guided Learning Platform</title>
+    <meta name="description" content="Edu-Alt-Tech bridges the execution gap through peer-to-peer teaching, mentor-guided accountability, and assistive AI. Learn skills that matter with real mentors.">
+    <meta name="keywords" content="alternative education, mentor-guided learning, peer-to-peer teaching, online courses, skill development, edtech">
+    <meta name="author" content="Edu-Alt-Tech">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#10b981">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/logo.png">
+    <link rel="shortcut icon" href="/logo.png">
+    <link rel="apple-touch-icon" href="/logo.png">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.edualttech.com/">
+    <meta property="og:title" content="EduAltTech | Alternative Education & Mentor-Guided Learning Platform">
+    <meta property="og:description" content="Edu-Alt-Tech bridges the execution gap through peer-to-peer teaching, mentor-guided accountability, and assistive AI.">
+    <meta property="og:image" content="https://www.edualttech.com/logo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="EduAltTech | Alternative Education & Mentor-Guided Learning Platform">
+    <meta name="twitter:description" content="Edu-Alt-Tech bridges the execution gap through peer-to-peer teaching, mentor-guided accountability, and assistive AI.">
+    <meta name="twitter:image" content="https://www.edualttech.com/logo.png">
+
+    <!-- JSON-LD -->
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Edu-Alt-Tech","url":"https://www.edualttech.com","logo":"https://www.edualttech.com/logo.png","description":"Bridging the execution gap through peer-to-peer teaching, mentor-guided accountability, and assistive AI.","foundingDate":"2025","contactPoint":{"@type":"ContactPoint","email":"info@edualttech.com","contactType":"customer support"},"sameAs":[]}</script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600;1,700&family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"></noscript>
+
+    <!-- Static Pre-mount Loader -->
+    <style>
+      #edu-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+    </style>
+    <!-- Remove any previously stored dark theme preference -->
+    <script>localStorage.removeItem('theme'); document.documentElement.classList.remove('dark');</script>
+</head>
+<body class="text-slate-900 transition-colors duration-300">
+
+    <!-- Page loader -->
+    <div id="edu-loader"></div>
+
+    <div id="root"></div>
+    <script type="module" src="/index.jsx"></script>
+    <script defer src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Remove loader once React mounts -->
+    <script>
+      (function(){
+        var root=document.getElementById('root');
+        var loader=document.getElementById('edu-loader');
+        if(!root||!loader)return;
+        var ob=new MutationObserver(function(){
+          if(root.children.length>0){
+            loader.style.opacity='0';
+            loader.style.transition='opacity 0.4s ease';
+            setTimeout(function(){loader.remove();},400);
+            ob.disconnect();
+          }
+        });
+        ob.observe(root,{childList:true});
+      })();
+    </script>
+</body>
+</html>
