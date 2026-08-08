@@ -278,14 +278,14 @@ function Navbar() {
                 {!user ? (
                   <Link
                     to="/login"
-                    className="relative inline-flex items-center bg-gradient-to-r from-[#FF7A00] via-[#FF6000] to-[#E64A00] hover:from-[#E66E00] hover:to-[#CC3B00] text-white rounded-2xl overflow-hidden shadow-md shadow-orange-500/25 transition-all group border border-orange-400/30 hover:scale-[1.03] active:scale-[0.98]"
+                    className="relative inline-flex items-center bg-gradient-to-r from-[#0047AB] via-[#003888] to-[#002D6C] hover:from-[#003888] hover:to-[#002050] text-white rounded-2xl overflow-hidden shadow-md shadow-blue-600/25 transition-all group border border-blue-400/30 hover:scale-[1.03] active:scale-[0.98]"
                   >
                     <span className="px-5 py-2.5 font-black text-sm text-white tracking-wide">
                       Log In
                     </span>
-                    <div className="bg-[#D13C00] h-full py-2.5 pl-3.5 pr-2.5 flex items-center justify-center [clip-path:polygon(25%_0,100%_0,100%_100%,0_100%)]">
+                    <div className="bg-[#00255A] h-full py-2.5 pl-3.5 pr-2.5 flex items-center justify-center [clip-path:polygon(25%_0,100%_0,100%_100%,0_100%)]">
                       <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:translate-x-0.5 transition-transform">
-                        <ChevronRight className="w-4 h-4 text-[#FF5500]" />
+                        <ChevronRight className="w-4 h-4 text-[#0047AB]" />
                       </div>
                     </div>
                   </Link>
@@ -408,11 +408,11 @@ function Navbar() {
                   <Link
                     to="/login"
                     onClick={() => setIsOpen(false)}
-                    className="relative flex items-center justify-between bg-gradient-to-r from-[#FF7A00] via-[#FF6000] to-[#E64A00] text-white px-6 py-3.5 rounded-2xl font-black text-center shadow-lg shadow-orange-500/25 transition-all"
+                    className="relative flex items-center justify-between bg-gradient-to-r from-[#0047AB] via-[#003888] to-[#002D6C] text-white px-6 py-3.5 rounded-2xl font-black text-center shadow-lg shadow-blue-600/25 transition-all"
                   >
                     <span>Log In</span>
                     <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm">
-                      <ChevronRight className="w-4 h-4 text-[#FF5500]" />
+                      <ChevronRight className="w-4 h-4 text-[#0047AB]" />
                     </div>
                   </Link>
                 ) : (

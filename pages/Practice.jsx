@@ -37,7 +37,7 @@ function ProblemCard({ problem, user, onLockedClick }) {
     layout
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    className="border border-slate-200 rounded-xl p-3 sm:p-4 hover:shadow-lg hover:border-emerald-500 transition-all duration-300 min-w-0"
+    className="border border-slate-300/90 bg-white/95 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-purple-500 hover:-translate-y-0.5 transition-all duration-300 min-w-0"
   >
   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3"> <div className="flex-1 min-w-0">
    <div className="flex items-center gap-2 mb-1"> <span className="text-[10px] sm:text-xs font-bold text-slate-400 shrink-0">#{problem.num}</span>
@@ -53,7 +53,7 @@ function ProblemCard({ problem, user, onLockedClick }) {
   </span>)}
   {problem.companies.length > 3 && <span className="text-[10px] text-slate-400 shrink-0">+{problem.companies.length - 3}</span>}
   </div>}
- </div>
+  </div>
   <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end mt-3 sm:mt-0 pt-3 sm:pt-0 border-t border-slate-100 sm:border-t-0">
   <a
     href={problem.leetcodeUrl}
@@ -89,7 +89,7 @@ function CourseCard({ course, user, onLockedClick }) {
     target="_blank"
     rel="noopener noreferrer"
     onClick={handleAction}
-    className="block border border-slate-200 rounded-xl p-4 hover:shadow-lg hover:border-emerald-500 transition-all duration-300 group min-w-0"
+    className="block border border-slate-300/90 bg-white/95 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-purple-500 hover:-translate-y-0.5 transition-all duration-300 group min-w-0"
   >
       <div className="flex items-center gap-3"> <div className="w-10 h-10 rounded-xl bg-emerald-100/20 text-emerald-500 flex items-center justify-center shrink-0">
           <Youtube className="w-5 h-5" />
@@ -117,7 +117,7 @@ function InterviewCard({ interview, user, onLockedClick }) {
     target="_blank"
     rel="noopener noreferrer"
     onClick={handleAction}
-    className="block border border-slate-200 rounded-xl p-4 hover:shadow-lg hover:border-emerald-500 transition-all duration-300 group min-w-0"
+    className="block border border-slate-300/90 bg-white/95 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-purple-500 hover:-translate-y-0.5 transition-all duration-300 group min-w-0"
   >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3"> <div className="flex-1 min-w-0">
           <h3 className="font-bold text-slate-900 text-sm group-hover:text-emerald-600 transition-colors whitespace-normal break-words">{interview.company}</h3> <p className="text-xs text-slate-500 mt-0.5 whitespace-normal break-words">{interview.interviewType}</p>
@@ -154,12 +154,12 @@ function EnglishExerciseCard({ exercise, user, onLockedClick }) {
     layout
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    className="border border-slate-200 rounded-xl p-3 sm:p-4 hover:shadow-lg hover:border-emerald-500 transition-all duration-300 min-w-0"
+    className="border border-slate-300/90 bg-white/95 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-purple-500 hover:-translate-y-0.5 transition-all duration-300 min-w-0"
   >
   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3"> <div className="flex-1 min-w-0">
   <div className="flex items-center gap-2 mb-1"> <span className="text-[10px] sm:text-xs font-bold text-slate-400 shrink-0">#{exercise.num}</span>
                    <h3 className="text-sm sm:text-base font-bold text-slate-900 truncate break-words">{exercise.title}</h3>
- </div>
+  </div>
  <div className="flex items-center gap-2 flex-wrap"> <span className="px-2 py-0.5 rounded-md text-[10px] font-bold border bg-indigo-100 text-indigo-700 border-indigo-200 ">
  {exercise.level}
  </span>
@@ -195,7 +195,7 @@ function ChannelCard({ channel, user, onLockedClick }) {
       onLockedClick();
     }
   };
-  return <div className="border border-slate-200 rounded-xl p-4 hover:shadow-lg hover:border-emerald-500 transition-all duration-300 min-w-0">
+  return <div className="border border-slate-300/90 bg-white/95 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:border-purple-500 hover:-translate-y-0.5 transition-all duration-300 min-w-0">
       <a
     href={channel.url}
     target="_blank"
@@ -312,29 +312,31 @@ const Practice = () => {
   }, [filteredEnglish, user]);
   return <div className="practice-page-container min-h-screen pt-24 pb-20 sm:pt-32 sm:pb-32 px-4 md:px-6 relative overflow-hidden">
   <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[60px] rounded-full max-w-full" /> <div className="max-w-[1400px] mx-auto relative z-10">
-  <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mb-12"> <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold uppercase tracking-widest text-[10px] mb-6">
-  <Sparkles className="w-4 h-4" />
-  Practice & Interview Prep
-  </div>
-  <h1 className="text-3xl sm:text-5xl md:text-7xl font-black text-slate-900 mb-6 tracking-tighter leading-[0.9]"> Master Coding &<br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500">English Grammar</span>
-  </h1>
-  <p className="text-sm sm:text-lg text-slate-500 max-w-xl font-medium">
-  460+ LeetCode problems, 52 English grammar topics, video solutions, full courses, and interview prep.
-  </p>
+  <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="max-w-5xl mx-auto mb-12 text-center flex flex-col items-center">
+    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold uppercase tracking-widest text-[10px] mb-6">
+      <Sparkles className="w-4 h-4" />
+      Practice & Interview Prep
+    </div>
+    <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tighter leading-tight text-center">
+      Master Coding & <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500">English Grammar</span>
+    </h1>
+    <p className="text-sm sm:text-lg text-slate-500 max-w-2xl font-medium text-center mx-auto">
+      460+ LeetCode problems, 52 English grammar topics, video solutions, full courses, and interview prep.
+    </p>
   </motion.div>
 
  {
     /* Tabs */
   }
- <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex gap-2 mb-8 border-b border-slate-200 pb-4 overflow-x-auto no-scrollbar">
- {tabs.map((t) => <button
+  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="flex justify-center gap-2.5 mb-8 border-b border-slate-200 pb-5 overflow-x-auto no-scrollbar">
+  {tabs.map((t) => <button
     key={t.key}
     onClick={() => setTab(t.key)}
-    className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 rounded-xl text-[11px] sm:text-sm font-bold transition-colors whitespace-nowrap ${tab === t.key ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "text-slate-600 hover:bg-slate-100"}`}
+    className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2.5 rounded-xl text-[11px] sm:text-sm font-extrabold transition-all whitespace-nowrap ${tab === t.key ? "bg-purple-600 text-white border border-purple-600 shadow-lg shadow-purple-500/25 scale-[1.02]" : "bg-white/90 text-slate-700 border border-slate-300/80 shadow-sm hover:border-purple-400 hover:bg-purple-50/80 hover:text-purple-700"}`}
   >
- {t.icon} {t.label}
- </button>)}
- </motion.div>
+  {t.icon} {t.label}
+  </button>)}
+  </motion.div>
 
   {
     /* Tab Content Container */
@@ -347,10 +349,11 @@ const Practice = () => {
    {
     /* Problem Set Toggle */
   }
-  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="flex gap-1.5 sm:gap-2 mb-6 overflow-x-auto no-scrollbar"> <button onClick={() => setProblemSet("popular")} className={`shrink-0 px-3 sm:px-4 py-2 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-colors ${problemSet === "popular" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 "}`}>Most Popular ({POPULAR_PROBLEMS.length})</button>
-  <button onClick={() => setProblemSet("leetcode150")} className={`shrink-0 px-3 sm:px-4 py-2 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-colors ${problemSet === "leetcode150" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 "}`}>LeetCode 150 ({LEETCODE_150_PROBLEMS.length})</button>
-  <button onClick={() => setProblemSet("top150")} className={`shrink-0 px-3 sm:px-4 py-2 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-colors ${problemSet === "top150" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 "}`}>Top Interview 150 ({TOP_INTERVIEW_150.length})</button>
-   {adminProblems.length > 0 && <button onClick={() => setProblemSet("admin")} className={`shrink-0 px-3 sm:px-4 py-2 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-colors ${problemSet === "admin" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200 "}`}>Custom ({adminProblems.length})</button>}
+  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="flex gap-2 sm:gap-2.5 mb-6 overflow-x-auto no-scrollbar">
+    <button onClick={() => setProblemSet("popular")} className={`shrink-0 px-3.5 sm:px-4.5 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all ${problemSet === "popular" ? "bg-purple-600 text-white border border-purple-600 shadow-lg shadow-purple-500/25" : "bg-white text-slate-700 hover:bg-purple-50 hover:text-purple-700 border border-slate-300 shadow-sm"}`}>Most Popular ({POPULAR_PROBLEMS.length})</button>
+    <button onClick={() => setProblemSet("leetcode150")} className={`shrink-0 px-3.5 sm:px-4.5 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all ${problemSet === "leetcode150" ? "bg-purple-600 text-white border border-purple-600 shadow-lg shadow-purple-500/25" : "bg-white text-slate-700 hover:bg-purple-50 hover:text-purple-700 border border-slate-300 shadow-sm"}`}>LeetCode 150 ({LEETCODE_150_PROBLEMS.length})</button>
+    <button onClick={() => setProblemSet("top150")} className={`shrink-0 px-3.5 sm:px-4.5 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all ${problemSet === "top150" ? "bg-purple-600 text-white border border-purple-600 shadow-lg shadow-purple-500/25" : "bg-white text-slate-700 hover:bg-purple-50 hover:text-purple-700 border border-slate-300 shadow-sm"}`}>Top Interview 150 ({TOP_INTERVIEW_150.length})</button>
+    {adminProblems.length > 0 && <button onClick={() => setProblemSet("admin")} className={`shrink-0 px-3.5 sm:px-4.5 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all ${problemSet === "admin" ? "bg-purple-600 text-white border border-purple-600 shadow-lg shadow-purple-500/25" : "bg-white text-slate-700 hover:bg-purple-50 hover:text-purple-700 border border-slate-300 shadow-sm"}`}>Custom ({adminProblems.length})</button>}
   </motion.div>
 
    {
@@ -363,14 +366,14 @@ const Practice = () => {
     placeholder="Search problems..."
     value={search}
     onChange={(e) => setSearch(e.target.value)}
-    className="w-full pl-8 sm:pl-10 pr-2.5 sm:pr-3 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 placeholder-slate-400"
+    className="w-full pl-8 sm:pl-10 pr-2.5 sm:pr-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm shadow-sm hover:border-purple-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none text-slate-900 placeholder-slate-400 transition-all"
   />
     </div>
   <div className="flex gap-2 w-full sm:w-auto">
     <select
     value={topicFilter}
     onChange={(e) => setTopicFilter(e.target.value)}
-    className="flex-1 sm:flex-none px-2.5 sm:px-3 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-600 focus:ring-2 focus:ring-emerald-500 outline-none min-w-0 sm:min-w-[140px] truncate"
+    className="flex-1 sm:flex-none px-2.5 sm:px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 shadow-sm hover:border-purple-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none min-w-0 sm:min-w-[140px] truncate transition-all"
   >
     <option value="">All Topics</option>
     {allTopics.map((t) => <option key={t} value={t}>{t}</option>)}
@@ -378,7 +381,7 @@ const Practice = () => {
     <select
     value={diffFilter}
     onChange={(e) => setDiffFilter(e.target.value)}
-    className="flex-1 sm:flex-none px-2.5 sm:px-3 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-600 focus:ring-2 focus:ring-emerald-500 outline-none min-w-0 sm:min-w-[140px] truncate"
+    className="flex-1 sm:flex-none px-2.5 sm:px-3 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 shadow-sm hover:border-purple-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none min-w-0 sm:min-w-[140px] truncate transition-all"
   >
   <option value="">All Difficulties</option>
   <option value="Easy">Easy</option>
@@ -418,7 +421,7 @@ const Practice = () => {
     placeholder="Search courses..."
     value={search}
     onChange={(e) => setSearch(e.target.value)}
-    className="w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-2 sm:py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 placeholder-slate-400"
+    className="w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-2 sm:py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm shadow-sm hover:border-purple-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none text-slate-900 placeholder-slate-400 transition-all"
   />
     </div>
   </motion.div>
@@ -445,13 +448,13 @@ const Practice = () => {
     placeholder="Search grammar..."
     value={englishSearch}
     onChange={(e) => setEnglishSearch(e.target.value)}
-    className="w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-2 sm:py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 outline-none text-slate-900 placeholder-slate-400"
+    className="w-full pl-8 sm:pl-10 pr-2 sm:pr-3 py-2 sm:py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm shadow-sm hover:border-purple-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none text-slate-900 placeholder-slate-400 transition-all"
   />
   </div>
    <select
     value={levelFilter}
     onChange={(e) => setLevelFilter(e.target.value)}
-    className="px-2.5 sm:px-3 py-2 sm:py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-600 focus:ring-2 focus:ring-emerald-500 outline-none min-w-[100px] max-w-[140px] sm:max-w-none sm:min-w-[140px] truncate"
+    className="px-2.5 sm:px-3 py-2 sm:py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 shadow-sm hover:border-purple-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none min-w-[100px] max-w-[140px] sm:max-w-none sm:min-w-[140px] truncate transition-all"
   >
   <option value="">All Levels</option>
   {allLevels.map((l) => <option key={l} value={l}>{l}</option>)}
@@ -461,7 +464,7 @@ const Practice = () => {
       setEnglishSearch("");
       setLevelFilter("");
     }}
-    className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 sm:py-2.5 border border-slate-200 rounded-xl text-[10px] sm:text-xs font-bold text-slate-500 hover:text-red-500 hover:border-red-200 transition-colors"
+    className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-2 sm:py-2.5 border border-slate-300 rounded-xl text-[10px] sm:text-xs font-bold text-slate-500 hover:text-red-500 hover:border-red-200 transition-colors"
   >
       <X className="w-3 sm:w-3.5 h-3 sm:h-3.5" /> Clear
     </button>}
@@ -480,7 +483,7 @@ const Practice = () => {
     <select
     value={channelFilter}
     onChange={(e) => setChannelFilter(e.target.value)}
-    className="px-2.5 sm:px-3 py-2 sm:py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-600 focus:ring-2 focus:ring-emerald-500 outline-none min-w-[100px] max-w-[140px] sm:max-w-none sm:min-w-[140px] truncate"
+    className="px-2.5 sm:px-3 py-2 sm:py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 shadow-sm hover:border-purple-300 focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none min-w-[100px] max-w-[140px] sm:max-w-none sm:min-w-[140px] truncate transition-all"
   >
     <option value="">All Categories</option>
     {Array.from(new Set(YOUTUBE_CHANNELS.map((c) => c.category))).sort().map((cat) => <option key={cat} value={cat}>{cat}</option>)}
