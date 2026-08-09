@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, User as LucideUser, ChevronDown, ChevronRight } from "lucide-react";
 import { auth, db, onAuthStateChanged, doc, getDoc } from "../lib/firebase";
 import { updateLoginStreak } from "../lib/streak";
+import { initGlobalSessionTimer } from "../lib/sessionTimer";
 import { motion, AnimatePresence } from "framer-motion";
 
 function Navbar() {
@@ -54,6 +55,7 @@ function Navbar() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      initGlobalSessionTimer(currentUser);
       if (currentUser) {
         updateLoginStreak(currentUser);
         try {

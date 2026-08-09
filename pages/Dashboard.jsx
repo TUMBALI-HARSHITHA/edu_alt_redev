@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { auth, db, onAuthStateChanged, doc, onSnapshot, collection, query, where, getDocs, orderBy, limit } from "../lib/firebase";
-import { Loader2, BookOpen, Download, Award, FileText, GraduationCap, ArrowRight, Clock, Sparkles, Video, Users, Lightbulb, MessageSquare, Send, Code2, History, Bell, Calendar, Lock, ArrowUpCircle, Flame, BarChart3 } from "lucide-react";
+import { Loader2, BookOpen, Download, Award, FileText, GraduationCap, ArrowRight, Clock, Sparkles, Video, Users, Lightbulb, MessageSquare, Send, Code2, History, Bell, Calendar, Lock, ArrowUpCircle, Flame, BarChart3, ChevronDown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { PLATFORM_COURSES } from "../data/platformCourses";
 import { getLastReadTimestamps } from "../lib/chatNotifications";
 import { getDualStreaks, updateLoginStreak } from "../lib/streak";
+import { subscribeSessionTimer, formatTime, getStudyGoal, setStudyGoal, initGlobalSessionTimer } from "../lib/sessionTimer";
 const getGreeting = () => {
   const h = (/* @__PURE__ */ new Date()).getHours();
   return h < 12 ? "Good Morning" : h < 18 ? "Good Afternoon" : "Good Evening";
@@ -96,19 +97,28 @@ const Dashboard = () => {
   const [allResources, setAllResources] = useState([]);
   const [sessionTime, setSessionTime] = useState(0);
   const dualStreaks = getDualStreaks(userProfile, user?.uid);
+  const [sessionTimerState, setSessionTimerState] = useState({ seconds: 0, isIdle: false, formatted: "0s" });
+  const [selectedGoalMinutes, setSelectedGoalMinutes] = useState(60);
+  const [showGoalMenu, setShowGoalMenu] = useState(false);
 
   useEffect(() => {
     if (user) {
       updateLoginStreak(user);
+      initGlobalSessionTimer(user);
+      setSelectedGoalMinutes(getStudyGoal(user.uid));
     }
   }, [user]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSessionTime((prev) => prev + 1);
-    }, 1e3);
-    return () => clearInterval(interval);
+    const unsub = subscribeSessionTimer((st) => setSessionTimerState(st));
+    return () => unsub();
   }, []);
+
+  const handleGoalChange = (mins) => {
+    setSelectedGoalMinutes(mins);
+    setStudyGoal(user, mins);
+    setShowGoalMenu(false);
+  };
   const formatSessionTime = (seconds) => {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor(seconds % 3600 / 60);
@@ -347,10 +357,11 @@ const Dashboard = () => {
   const enrolledCourseIds = [.../* @__PURE__ */ new Set([...enrollments.map((e) => e.courseId), ...teachingEnrollments.map((e) => e.courseId)])];
   const courseResCount = allResources.filter((r) => enrolledCourseIds.includes(r.courseId)).length;
   const resourceCount = downloadsCount + courseResCount;
-  const totalStudyTimeSeconds = userMetrics.reduce((sum, m) => sum + (m.totalTimeSpent || 0), 0);
-  const studyHours = Math.floor(totalStudyTimeSeconds / 3600);
-  const studyMinutes = Math.floor(totalStudyTimeSeconds % 3600 / 60);
-  const studyTimeFormatted = studyHours > 0 ? `${studyHours}h ${studyMinutes}m` : `${studyMinutes}m`;
+  const baseStudySeconds = userMetrics.reduce((sum, m) => sum + (m.totalTimeSpent || 0), 0);
+  const currentTotalStudySeconds = baseStudySeconds + sessionTimerState.seconds;
+  const studyTimeFormatted = formatTime(currentTotalStudySeconds);
+  const goalSeconds = selectedGoalMinutes * 60;
+  const goalProgressPercent = Math.min(100, Math.round((currentTotalStudySeconds / goalSeconds) * 100));
   const averageConsistency = userMetrics.length > 0 ? Math.round(userMetrics.reduce((sum, m) => sum + (m.consistencyScore || 0), 0) / userMetrics.length) : 0;
   const nextSteps = [];
   if (enrollments.length === 0 && myApplications.length === 0) {
@@ -659,46 +670,122 @@ Module Progress: ${data.progress}%`}</title>
     animate="show"
     className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
   >
-          {
-    /* 1. Study Time */
-  }
-          <motion.div variants={itemVariants} className="group hover:bg-gradient-to-br hover:from-white hover:to-indigo-50/30 border border-slate-200/80 rounded-3xl p-5 hover:border-indigo-400 hover:shadow-md transition-all duration-300 flex items-center justify-between gap-3">
-            <div className="min-w-0"> <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">Study Duration</span>
-              <span className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight block">
-                {studyTimeFormatted}
-              </span>
-              <span className="text-[10px] font-bold text-indigo-600 mt-1 flex items-center gap-1"> <Clock className="w-3.5 h-3.5" /> Study Time
-              </span>
+          {/* 1. Study Duration & Daily Goal Tracker (Idea 3) */}
+          <motion.div variants={itemVariants} className="group hover:bg-gradient-to-br hover:from-white hover:to-indigo-50/30 border border-slate-200/80 rounded-3xl p-5 hover:border-indigo-400 hover:shadow-md transition-all duration-300 flex flex-col justify-between relative overflow-visible">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">Study Duration</span>
+              <div className="relative">
+                <button
+                  onClick={() => setShowGoalMenu(!showGoalMenu)}
+                  className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-full text-[10px] font-black uppercase tracking-wider border border-indigo-200/80 flex items-center gap-1 transition-all"
+                >
+                  <span>Goal: {selectedGoalMinutes}m</span>
+                  <ChevronDown className="w-3 h-3 text-indigo-500" />
+                </button>
+
+                {showGoalMenu && (
+                  <div className="absolute right-0 top-full mt-1.5 w-32 bg-white border border-slate-200 rounded-2xl p-1.5 shadow-xl z-50 flex flex-col gap-1 text-xs">
+                    {[30, 60, 90, 120].map((mins) => (
+                      <button
+                        key={mins}
+                        onClick={() => handleGoalChange(mins)}
+                        className={`w-full text-left px-3 py-1.5 rounded-xl font-bold transition-all ${selectedGoalMinutes === mins ? 'bg-indigo-600 text-white' : 'text-slate-700 hover:bg-indigo-50'}`}
+                      >
+                        {mins} mins {mins === 60 ? '(Default)' : ''}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-            <Sparkline />
+
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div>
+                <span className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight block font-mono">
+                  {studyTimeFormatted}
+                </span>
+                <span className="text-[10px] font-bold text-indigo-600 mt-0.5 flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" /> Total Active Learning
+                </span>
+              </div>
+              <Sparkline />
+            </div>
+
+            <div className="w-full pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 mb-1">
+                <span>Daily Target</span>
+                <span className="text-indigo-600 font-extrabold">{goalProgressPercent}%</span>
+              </div>
+              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-500"
+                  style={{ width: `${goalProgressPercent}%` }}
+                />
+              </div>
+            </div>
           </motion.div>
 
-          {
-    /* 2. Session Duration */
-  }
-          <motion.div variants={itemVariants} className="group hover:bg-gradient-to-br hover:from-white hover:to-emerald-50/30 border border-slate-200/80 rounded-3xl p-5 hover:border-emerald-400 hover:shadow-md transition-all duration-300 flex items-center justify-between gap-3">
-            <div className="min-w-0"> <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">Session Active</span>
-              <span className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight block font-mono">
-                {formatSessionTime(sessionTime)}
-              </span>
-              <span className="text-[10px] font-bold text-emerald-600 mt-1 flex items-center gap-1"> <Clock className="w-3.5 h-3.5 animate-pulse" /> Time on site
+          {/* 2. Session Active & Auto-Pause Indicator (Ideas 1 & 2) */}
+          <motion.div variants={itemVariants} className="group hover:bg-gradient-to-br hover:from-white hover:to-emerald-50/30 border border-slate-200/80 rounded-3xl p-5 hover:border-emerald-400 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">Session Active</span>
+              <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border flex items-center gap-1 ${sessionTimerState.isIdle ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-emerald-100 text-emerald-800 border-emerald-300'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${sessionTimerState.isIdle ? 'bg-amber-500' : 'bg-emerald-500 animate-ping'}`} />
+                {sessionTimerState.isIdle ? '⏸️ Auto-Paused' : '🟢 Active'}
               </span>
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"> <Clock className="w-5 h-5 animate-spin" style={{ animationDuration: "6s" }} />
+
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <div>
+                <span className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight block font-mono">
+                  {sessionTimerState.formatted}
+                </span>
+                <span className="text-[10px] font-bold text-emerald-600 mt-0.5 flex items-center gap-1">
+                  <Clock className={`w-3.5 h-3.5 ${!sessionTimerState.isIdle ? 'animate-pulse' : ''}`} />
+                  {sessionTimerState.isIdle ? 'Paused due to inactivity' : 'Global site activity'}
+                </span>
+              </div>
+              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${sessionTimerState.isIdle ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                <Clock className={`w-5 h-5 ${!sessionTimerState.isIdle ? 'animate-spin' : ''}`} style={{ animationDuration: "6s" }} />
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-100">
+              <p className="text-[10px] text-slate-400 font-medium leading-tight">
+                {sessionTimerState.isIdle
+                  ? 'Move mouse or type to resume tracking.'
+                  : 'Smart auto-pauses after 2 minutes of idle time.'}
+              </p>
             </div>
           </motion.div>
 
-          {
-    /* 3. Solved Problems */
-  }
-          <motion.div variants={itemVariants} className="group hover:bg-gradient-to-br hover:from-white hover:to-purple-50/30 border border-slate-200/80 rounded-3xl p-5 hover:border-purple-400 hover:shadow-md transition-all duration-300 flex items-center justify-between gap-3">
-            <div className="min-w-0"> <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">Practiced</span>
-              <span className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight block"> {leetcodeCount + englishCount > 0 ? `${leetcodeCount + englishCount}` : "0"}
-              </span>
-              <span className="text-[10px] font-bold text-purple-600 mt-1 flex items-center gap-1"> <Code2 className="w-3.5 h-3.5" /> Solved problems
+          {/* 3. Solved Problems */}
+          <motion.div variants={itemVariants} className="group hover:bg-gradient-to-br hover:from-white hover:to-purple-50/30 border border-slate-200/80 rounded-3xl p-5 hover:border-purple-400 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">Practiced</span>
+              <span className="px-2.5 py-1 bg-purple-50 text-purple-700 rounded-full text-[9px] font-black uppercase tracking-wider border border-purple-200">
+                Hub Completed
               </span>
             </div>
-            <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0"> <Award className="w-5 h-5" />
+
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <div>
+                <span className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight block">
+                  {leetcodeCount + englishCount > 0 ? `${leetcodeCount + englishCount}` : "0"}
+                </span>
+                <span className="text-[10px] font-bold text-purple-600 mt-0.5 flex items-center gap-1">
+                  <Code2 className="w-3.5 h-3.5" /> Solved problems & exercises
+                </span>
+              </div>
+              <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                <Award className="w-5 h-5" />
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-slate-100">
+              <p className="text-[10px] text-slate-400 font-medium leading-tight">
+                Practice questions & LeetCode tasks completed.
+              </p>
             </div>
           </motion.div>
         </motion.div>
