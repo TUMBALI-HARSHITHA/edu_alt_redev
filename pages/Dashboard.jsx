@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { PLATFORM_COURSES } from "../data/platformCourses";
 import { getLastReadTimestamps } from "../lib/chatNotifications";
+import { getDualStreaks, updateLoginStreak } from "../lib/streak";
 const getGreeting = () => {
   const h = (/* @__PURE__ */ new Date()).getHours();
   return h < 12 ? "Good Morning" : h < 18 ? "Good Afternoon" : "Good Evening";
@@ -94,6 +95,14 @@ const Dashboard = () => {
   const [downloadsCount, setDownloadsCount] = useState(0);
   const [allResources, setAllResources] = useState([]);
   const [sessionTime, setSessionTime] = useState(0);
+  const dualStreaks = getDualStreaks(userProfile, user?.uid);
+
+  useEffect(() => {
+    if (user) {
+      updateLoginStreak(user);
+    }
+  }, [user]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       setSessionTime((prev) => prev + 1);
@@ -499,6 +508,69 @@ Module Progress: ${data.progress}%`}</title>
               <Link to="/practice" className="inline-flex items-center gap-2 px-5 py-2.5 !text-emerald-700 rounded-full text-xs font-black shadow-md hover:shadow-lg hover:bg-emerald-50 hover:scale-[1.03] transition-all duration-300">
                 <Code2 className="w-3.5 h-3.5 text-emerald-600" /> Practice Hub
               </Link>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── Dual Streaks Tracker Section ── */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6"
+        >
+          {/* Card 1: Daily Login Streak */}
+          <div className="relative overflow-hidden rounded-[2rem] p-6 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white shadow-xl shadow-orange-500/20 border border-white/20">
+            <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+              <Flame className="w-36 h-36 text-white" />
+            </div>
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-inner">
+                <Flame className="w-6 h-6 text-amber-200 fill-amber-300 animate-pulse" />
+              </div>
+              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${dualStreaks.isLoginToday ? 'bg-emerald-500/30 text-emerald-100 border-emerald-300/40' : 'bg-white/20 text-white border-white/30'}`}>
+                {dualStreaks.isLoginToday ? "🔥 Active Today" : "⚡ Log in Daily"}
+              </span>
+            </div>
+            <div className="relative z-10">
+              <div className="text-3xl sm:text-4xl font-black tracking-tight mb-1 text-white">
+                {dualStreaks.loginStreak} <span className="text-xl font-bold text-amber-100">Days</span>
+              </div>
+              <h3 className="font-extrabold text-sm text-amber-100 uppercase tracking-wider mb-1">
+                Daily Login Streak
+              </h3>
+              <p className="text-xs text-amber-50/90 leading-relaxed font-medium">
+                {dualStreaks.isLoginToday
+                  ? "Great job! You logged in today and kept your streak burning."
+                  : "Log in every single day to maintain and grow your login streak!"}
+              </p>
+            </div>
+          </div>
+
+          {/* Card 2: Learning Activity Streak */}
+          <div className="relative overflow-hidden rounded-[2rem] p-6 bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700 text-white shadow-xl shadow-teal-500/20 border border-white/20">
+            <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+              <Sparkles className="w-36 h-36 text-white" />
+            </div>
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-inner">
+                <Sparkles className="w-6 h-6 text-teal-200 fill-teal-300" />
+              </div>
+              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${dualStreaks.isLearningToday ? 'bg-emerald-400/30 text-emerald-100 border-emerald-300/40' : 'bg-white/20 text-white border-white/30'}`}>
+                {dualStreaks.isLearningToday ? "✅ Activity Recorded Today" : "🎯 Solve 1 Activity Today"}
+              </span>
+            </div>
+            <div className="relative z-10">
+              <div className="text-3xl sm:text-4xl font-black tracking-tight mb-1 text-white">
+                {dualStreaks.learningStreak} <span className="text-xl font-bold text-teal-100">Days</span>
+              </div>
+              <h3 className="font-extrabold text-sm text-teal-100 uppercase tracking-wider mb-1">
+                Learning Activity Streak
+              </h3>
+              <p className="text-xs text-teal-50/90 leading-relaxed font-medium">
+                {dualStreaks.isLearningToday
+                  ? `Last activity: ${dualStreaks.lastActivity}`
+                  : "Solve a problem, complete a practice exercise, or view study notes today to increase your streak!"}
+              </p>
             </div>
           </div>
         </motion.div>

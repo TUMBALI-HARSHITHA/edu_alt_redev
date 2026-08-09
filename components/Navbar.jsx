@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, User as LucideUser, ChevronDown, ChevronRight } from "lucide-react";
 import { auth, db, onAuthStateChanged, doc, getDoc } from "../lib/firebase";
+import { updateLoginStreak } from "../lib/streak";
 import { motion, AnimatePresence } from "framer-motion";
 
 function Navbar() {
@@ -54,6 +55,7 @@ function Navbar() {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
+        updateLoginStreak(currentUser);
         try {
           const docSnap = await getDoc(doc(db, "users", currentUser.uid));
           if (docSnap.exists()) setUserProfile(docSnap.data());

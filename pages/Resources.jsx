@@ -9,6 +9,7 @@ import LoginModal from "../components/LoginModal";
 import { getDriveSubfolders, getDriveDownloadUrl, getDriveFileCategory } from "../lib/drive";
 import { PLATFORM_COURSES } from "../data/platformCourses";
 import { AI_COURSES } from "./Courses";
+import { recordLearningActivity } from "../lib/streak";
 
 const DRIVE_FALLBACK_LINK = "https://drive.google.com/file/d/1toMlJExBP-titjEoCrn3TjKq6ToEC7rb/view";
 
@@ -380,6 +381,7 @@ const Resources = () => {
 
   const trackDownload = async (item) => {
     if (!auth.currentUser) return;
+    recordLearningActivity(auth.currentUser, `Resource: ${item.title}`);
     try {
       await db.from("user_downloads").insert({
         user_id: auth.currentUser.uid,

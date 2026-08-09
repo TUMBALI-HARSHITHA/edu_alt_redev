@@ -5,6 +5,8 @@ import { normalizeSearch } from "../lib/search";
 import { POPULAR_PROBLEMS, LEETCODE_150_PROBLEMS, TOP_INTERVIEW_150, FULL_COURSES, INTERVIEW_EXPERIENCES, YOUTUBE_CHANNELS, ENGLISH_EXERCISES } from "../data/problems";
 import { auth, onAuthStateChanged, db, collection, getDocs, query, orderBy } from "../lib/firebase";
 import LoginModal from "../components/LoginModal";
+import { recordLearningActivity } from "../lib/streak";
+
 const difficultyColors = {
   Easy: "bg-emerald-100 text-emerald-700 border-emerald-200 ",
   Medium: "bg-amber-100 text-amber-700 border-amber-200 ",
@@ -20,6 +22,7 @@ function ProblemCard({ problem, user, onLockedClick }) {
       onLockedClick();
       return;
     }
+    recordLearningActivity(user, `Solved ${problem.title}`);
     (async () => {
       try {
         await db.from("practice_history").insert({
@@ -137,6 +140,7 @@ function EnglishExerciseCard({ exercise, user, onLockedClick }) {
       onLockedClick();
       return;
     }
+    recordLearningActivity(user, `English: ${exercise.title}`);
     (async () => {
       try {
         await db.from("practice_history").insert({
