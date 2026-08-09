@@ -133,7 +133,7 @@ function Navbar() {
     { name: "Contact", path: "/contact" }
   ];
 
-  const studentLinks = [
+  const loggedInLinks = [
     { name: "Home", path: "/" },
     { name: "Courses", path: "/courses" },
     { name: "Practice", path: "/practice" },
@@ -141,17 +141,9 @@ function Navbar() {
     { name: "Dashboard", path: "/dashboard" }
   ];
 
-  const adminLinks = [
-    { name: "Dashboard", path: "/dashboard" },
-    { name: "Admin Portal", path: "/admin" }
-  ];
-
   const isAdmin = userProfile?.role === "admin" || user?.email === "ukkukk97@gmail.com" || user?.email === "umakrishnakanthchokkapu15@gmail.com";
-  let navLinks = [...publicLinks];
-  if (user) {
-    navLinks.push({ name: "Dashboard", path: "/dashboard" });
-  }
-  if (isAdmin) {
+  let navLinks = user ? [...loggedInLinks] : [...publicLinks];
+  if (user && isAdmin) {
     navLinks.push({ name: "Admin", path: "/admin" });
   }
 
