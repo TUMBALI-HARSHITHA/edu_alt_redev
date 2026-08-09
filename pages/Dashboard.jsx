@@ -98,6 +98,7 @@ const Dashboard = () => {
   const [sessionTime, setSessionTime] = useState(0);
   const dualStreaks = getDualStreaks(userProfile, user?.uid);
   const [sessionTimerState, setSessionTimerState] = useState({ seconds: 0, isIdle: false, formatted: "0s" });
+  const [courseLearningState, setCourseLearningState] = useState({ seconds: 0, formatted: "0s" });
   const [selectedGoalMinutes, setSelectedGoalMinutes] = useState(60);
   const [showGoalMenu, setShowGoalMenu] = useState(false);
 
