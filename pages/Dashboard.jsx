@@ -362,10 +362,10 @@ const Dashboard = () => {
   const enrolledCourseIds = [.../* @__PURE__ */ new Set([...enrollments.map((e) => e.courseId), ...teachingEnrollments.map((e) => e.courseId)])];
   const courseResCount = allResources.filter((r) => enrolledCourseIds.includes(r.courseId)).length;
   const resourceCount = downloadsCount + courseResCount;
-  const actualCourseStudySeconds = getCourseLearningSeconds(user?.uid, userMetrics, userProfile?.courseLearningTime);
-  const studyTimeFormatted = formatTime(actualCourseStudySeconds);
+  const activeSessionSeconds = sessionTimerState.seconds || 0;
   const goalSeconds = selectedGoalMinutes * 60;
-  const goalProgressPercent = Math.min(100, Math.round((actualCourseStudySeconds / goalSeconds) * 100));
+  const goalProgressPercent = goalSeconds > 0 ? Math.min(100, Math.round((activeSessionSeconds / goalSeconds) * 100)) : 0;
+  const activeSessionFormatted = formatTime(activeSessionSeconds);
   const averageConsistency = userMetrics.length > 0 ? Math.round(userMetrics.reduce((sum, m) => sum + (m.consistencyScore || 0), 0) / userMetrics.length) : 0;
   const nextSteps = [];
   if (enrollments.length === 0 && myApplications.length === 0) {
@@ -710,7 +710,7 @@ Module Progress: ${data.progress}%`}</title>
                   {goalProgressPercent}%
                 </span>
                 <span className="text-[10px] font-bold text-indigo-600 mt-0.5 flex items-center gap-1">
-                  <Target className="w-3.5 h-3.5" /> Daily Target ({selectedGoalMinutes}m Goal)
+                  <Target className="w-3.5 h-3.5" /> {activeSessionFormatted} / {selectedGoalMinutes}m Target
                 </span>
               </div>
               <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
