@@ -518,27 +518,27 @@ Module Progress: ${data.progress}%`}</title>
           animate={{ opacity: 1, y: 0 }}
           className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6"
         >
-          {/* Card 1: Daily Login Streak */}
-          <div className="relative overflow-hidden rounded-[2rem] p-6 bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 text-white shadow-xl shadow-orange-500/20 border border-white/20">
+          {/* Card 1: Daily Login Streak (Logo Royal Blue) */}
+          <div className="relative overflow-hidden rounded-[2rem] p-6 bg-gradient-to-br from-[#0047AB] via-[#0052CC] to-[#0284C7] text-white shadow-xl shadow-blue-900/20 border border-white/20">
             <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
               <Flame className="w-36 h-36 text-white" />
             </div>
             <div className="flex items-start justify-between mb-4 relative z-10">
               <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-inner">
-                <Flame className="w-6 h-6 text-amber-200 fill-amber-300 animate-pulse" />
+                <Flame className="w-6 h-6 text-sky-200 fill-sky-200 animate-pulse" />
               </div>
-              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${dualStreaks.isLoginToday ? 'bg-emerald-500/30 text-emerald-100 border-emerald-300/40' : 'bg-white/20 text-white border-white/30'}`}>
+              <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${dualStreaks.isLoginToday ? 'bg-sky-400/30 text-sky-100 border-sky-300/40' : 'bg-white/20 text-white border-white/30'}`}>
                 {dualStreaks.isLoginToday ? "🔥 Active Today" : "⚡ Log in Daily"}
               </span>
             </div>
             <div className="relative z-10">
               <div className="text-3xl sm:text-4xl font-black tracking-tight mb-1 text-white">
-                {dualStreaks.loginStreak} <span className="text-xl font-bold text-amber-100">Days</span>
+                {dualStreaks.loginStreak} <span className="text-xl font-bold text-sky-100">Days</span>
               </div>
-              <h3 className="font-extrabold text-sm text-amber-100 uppercase tracking-wider mb-1">
+              <h3 className="font-extrabold text-sm text-sky-100 uppercase tracking-wider mb-1">
                 Daily Login Streak
               </h3>
-              <p className="text-xs text-amber-50/90 leading-relaxed font-medium">
+              <p className="text-xs text-sky-50/90 leading-relaxed font-medium">
                 {dualStreaks.isLoginToday
                   ? "Great job! You logged in today and kept your streak burning."
                   : "Log in every single day to maintain and grow your login streak!"}
@@ -546,14 +546,14 @@ Module Progress: ${data.progress}%`}</title>
             </div>
           </div>
 
-          {/* Card 2: Learning Activity Streak */}
-          <div className="relative overflow-hidden rounded-[2rem] p-6 bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700 text-white shadow-xl shadow-teal-500/20 border border-white/20">
+          {/* Card 2: Learning Activity Streak (Logo Forest Emerald) */}
+          <div className="relative overflow-hidden rounded-[2rem] p-6 bg-gradient-to-br from-[#047857] via-[#059669] to-[#0D9488] text-white shadow-xl shadow-emerald-900/20 border border-white/20">
             <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
               <Sparkles className="w-36 h-36 text-white" />
             </div>
             <div className="flex items-start justify-between mb-4 relative z-10">
               <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-inner">
-                <Sparkles className="w-6 h-6 text-teal-200 fill-teal-300" />
+                <Sparkles className="w-6 h-6 text-emerald-200 fill-emerald-200" />
               </div>
               <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${dualStreaks.isLearningToday ? 'bg-emerald-400/30 text-emerald-100 border-emerald-300/40' : 'bg-white/20 text-white border-white/30'}`}>
                 {dualStreaks.isLearningToday ? "✅ Activity Recorded Today" : "🎯 Solve 1 Activity Today"}
@@ -561,12 +561,12 @@ Module Progress: ${data.progress}%`}</title>
             </div>
             <div className="relative z-10">
               <div className="text-3xl sm:text-4xl font-black tracking-tight mb-1 text-white">
-                {dualStreaks.learningStreak} <span className="text-xl font-bold text-teal-100">Days</span>
+                {dualStreaks.learningStreak} <span className="text-xl font-bold text-emerald-100">Days</span>
               </div>
-              <h3 className="font-extrabold text-sm text-teal-100 uppercase tracking-wider mb-1">
+              <h3 className="font-extrabold text-sm text-emerald-100 uppercase tracking-wider mb-1">
                 Learning Activity Streak
               </h3>
-              <p className="text-xs text-teal-50/90 leading-relaxed font-medium">
+              <p className="text-xs text-emerald-50/90 leading-relaxed font-medium">
                 {dualStreaks.isLearningToday
                   ? `Last activity: ${dualStreaks.lastActivity}`
                   : "Solve a problem, complete a practice exercise, or view study notes today to increase your streak!"}
@@ -657,23 +657,10 @@ Module Progress: ${data.progress}%`}</title>
     variants={containerVariants}
     initial="hidden"
     animate="show"
-    className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+    className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
   >
           {
-    /* 1. Consistency */
-  }
-          <motion.div variants={itemVariants} className="group hover:bg-gradient-to-br hover:from-white hover:to-amber-50/30 border border-slate-200/80 rounded-3xl p-5 hover:border-amber-400 hover:shadow-md transition-all duration-300 flex items-center justify-between gap-3">
-            <div className="min-w-0"> <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">Consistency</span>
-              <span className="text-xl sm:text-2xl font-black text-slate-800 tracking-tight block"> {averageConsistency > 0 ? `${averageConsistency}%` : "\u2014"}
-              </span>
-              <span className="text-[10px] font-bold text-amber-600 mt-1 flex items-center gap-1"> <Flame className="w-3.5 h-3.5 fill-amber-500 stroke-none" /> Streak Habits
-              </span>
-            </div>
-            <ProgressRing progress={averageConsistency || 0} size={54} strokeWidth={4.5} colorClass="text-amber-500" glowClass="drop-shadow-[0_0_3px_rgba(245,158,11,0.3)]" />
-          </motion.div>
-
-          {
-    /* 2. Study Time */
+    /* 1. Study Time */
   }
           <motion.div variants={itemVariants} className="group hover:bg-gradient-to-br hover:from-white hover:to-indigo-50/30 border border-slate-200/80 rounded-3xl p-5 hover:border-indigo-400 hover:shadow-md transition-all duration-300 flex items-center justify-between gap-3">
             <div className="min-w-0"> <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">Study Duration</span>
@@ -687,7 +674,7 @@ Module Progress: ${data.progress}%`}</title>
           </motion.div>
 
           {
-    /* 3. Session Duration */
+    /* 2. Session Duration */
   }
           <motion.div variants={itemVariants} className="group hover:bg-gradient-to-br hover:from-white hover:to-emerald-50/30 border border-slate-200/80 rounded-3xl p-5 hover:border-emerald-400 hover:shadow-md transition-all duration-300 flex items-center justify-between gap-3">
             <div className="min-w-0"> <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">Session Active</span>
@@ -702,7 +689,7 @@ Module Progress: ${data.progress}%`}</title>
           </motion.div>
 
           {
-    /* 4. Solved Problems */
+    /* 3. Solved Problems */
   }
           <motion.div variants={itemVariants} className="group hover:bg-gradient-to-br hover:from-white hover:to-purple-50/30 border border-slate-200/80 rounded-3xl p-5 hover:border-purple-400 hover:shadow-md transition-all duration-300 flex items-center justify-between gap-3">
             <div className="min-w-0"> <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">Practiced</span>
