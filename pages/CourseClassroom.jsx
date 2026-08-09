@@ -12,6 +12,7 @@ import { getLastReadTimestamps, markCourseRead } from "../lib/chatNotifications"
 import DoubtSolver from "../components/DoubtSolver";
 import LearningPathView from "../components/LearningPathView";
 import SplashLoader from "../components/SplashLoader";
+import { initCourseLearningTimer } from "../lib/sessionTimer";
 const CourseClassroom = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -75,6 +76,7 @@ const CourseClassroom = () => {
         navigate("/login");
         return;
       }
+      initCourseLearningTimer(currentUser, true);
       try {
         const courseDoc = await getDoc(doc(db, "courses", courseId));
         if (courseDoc.exists()) {

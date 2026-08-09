@@ -6,6 +6,7 @@ import { POPULAR_PROBLEMS, LEETCODE_150_PROBLEMS, TOP_INTERVIEW_150, FULL_COURSE
 import { auth, onAuthStateChanged, db, collection, getDocs, query, orderBy } from "../lib/firebase";
 import LoginModal from "../components/LoginModal";
 import { recordLearningActivity } from "../lib/streak";
+import { recordLearningSeconds, initCourseLearningTimer } from "../lib/sessionTimer";
 
 const difficultyColors = {
   Easy: "bg-emerald-100 text-emerald-700 border-emerald-200 ",
@@ -23,6 +24,7 @@ function ProblemCard({ problem, user, onLockedClick }) {
       return;
     }
     recordLearningActivity(user, `Solved ${problem.title}`);
+    recordLearningSeconds(user, 300);
     (async () => {
       try {
         await db.from("practice_history").insert({

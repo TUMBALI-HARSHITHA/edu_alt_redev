@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { PLATFORM_COURSES } from "../data/platformCourses";
 import { getLastReadTimestamps } from "../lib/chatNotifications";
 import { getDualStreaks, updateLoginStreak } from "../lib/streak";
-import { subscribeSessionTimer, formatTime, getStudyGoal, setStudyGoal, initGlobalSessionTimer } from "../lib/sessionTimer";
+import { subscribeSessionTimer, formatTime, getStudyGoal, setStudyGoal, initGlobalSessionTimer, subscribeCourseLearningTimer, getCourseLearningSeconds } from "../lib/sessionTimer";
 const getGreeting = () => {
   const h = (/* @__PURE__ */ new Date()).getHours();
   return h < 12 ? "Good Morning" : h < 18 ? "Good Afternoon" : "Good Evening";
@@ -111,7 +111,11 @@ const Dashboard = () => {
 
   useEffect(() => {
     const unsub = subscribeSessionTimer((st) => setSessionTimerState(st));
-    return () => unsub();
+    const unsub2 = subscribeCourseLearningTimer((st) => setCourseLearningState(st));
+    return () => {
+      unsub();
+      unsub2();
+    };
   }, []);
 
   const handleGoalChange = (mins) => {
@@ -357,11 +361,10 @@ const Dashboard = () => {
   const enrolledCourseIds = [.../* @__PURE__ */ new Set([...enrollments.map((e) => e.courseId), ...teachingEnrollments.map((e) => e.courseId)])];
   const courseResCount = allResources.filter((r) => enrolledCourseIds.includes(r.courseId)).length;
   const resourceCount = downloadsCount + courseResCount;
-  const baseStudySeconds = userMetrics.reduce((sum, m) => sum + (m.totalTimeSpent || 0), 0);
-  const currentTotalStudySeconds = baseStudySeconds + sessionTimerState.seconds;
-  const studyTimeFormatted = formatTime(currentTotalStudySeconds);
+  const actualCourseStudySeconds = getCourseLearningSeconds(user?.uid, userMetrics, userProfile?.courseLearningTime);
+  const studyTimeFormatted = formatTime(actualCourseStudySeconds);
   const goalSeconds = selectedGoalMinutes * 60;
-  const goalProgressPercent = Math.min(100, Math.round((currentTotalStudySeconds / goalSeconds) * 100));
+  const goalProgressPercent = Math.min(100, Math.round((actualCourseStudySeconds / goalSeconds) * 100));
   const averageConsistency = userMetrics.length > 0 ? Math.round(userMetrics.reduce((sum, m) => sum + (m.consistencyScore || 0), 0) / userMetrics.length) : 0;
   const nextSteps = [];
   if (enrollments.length === 0 && myApplications.length === 0) {
