@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import LoginModal from "../components/LoginModal";
 import { PLATFORM_COURSES } from "../data/platformCourses";
+import { initCourseLearningTimer, recordLearningSeconds } from "../lib/sessionTimer";
 const FOLDER_MAP = {
   "Core Education": "education",
   "Language Skills": "education",
@@ -37,6 +38,9 @@ const Courses = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setUser(u);
+      if (u) {
+        initCourseLearningTimer(u, true);
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -467,6 +471,7 @@ const Courses = () => {
                           href={course.externalUrl}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => recordLearningSeconds(user, 180)}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-slate-800 transition-all active:scale-[0.98] shadow-sm"
                         >
                           Start Free <ExternalLink className="w-3 h-3" />

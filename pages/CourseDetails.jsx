@@ -6,6 +6,7 @@ import { ArrowLeft, CheckCircle2, Users, BookOpen, AlertCircle, Loader2, ArrowRi
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
 import SplashLoader from "../components/SplashLoader";
+import { initCourseLearningTimer, recordLearningSeconds } from "../lib/sessionTimer";
 const CourseDetails = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
@@ -125,7 +126,12 @@ const CourseDetails = () => {
         return;
       }
       setUser(currentUser);
-      fetchCourseAndEnrollment(currentUser);
+      if (currentUser) {
+        initCourseLearningTimer(currentUser, true);
+        fetchCourseAndEnrollment(currentUser);
+      } else {
+        fetchCourseAndEnrollment(null);
+      }
     });
     return () => unsubscribe();
   }, [courseId, navigate]);
