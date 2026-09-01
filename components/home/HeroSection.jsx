@@ -10,7 +10,7 @@ const HeroSection = () => {
   const user = auth.currentUser;
 
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-40 md:pt-24 lg:pt-28 pb-32 sm:pb-40 overflow-hidden">
+    <section className="relative min-h-[90vh] flex items-center pt-56 md:pt-24 lg:pt-28 pb-32 sm:pb-40 overflow-hidden">
       {/* Soft background glow */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#E0F2FE]/50 blur-[150px] rounded-full" />
@@ -24,7 +24,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9]"
+            className="mt-8 md:mt-0 text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9]"
           >
             <span style={{ fontFamily: 'Georgia, serif' }}>Learn. Build.</span><br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0047AB] to-[#3CB371] font-bitcount" style={{ fontFamily: '"Bitcount Prop Single", cursive, sans-serif' }}>
