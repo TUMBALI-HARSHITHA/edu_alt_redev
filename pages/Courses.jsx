@@ -165,7 +165,7 @@ const Courses = () => {
   <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-500/5 blur-[60px] rounded-full" />
   </div>
 
-  <div className="max-w-[1400px] mx-auto relative z-10 px-4 sm:px-6 py-16 md:py-24">
+  <div className="max-w-[1400px] mx-auto relative z-10 px-4 sm:px-6 pt-28 pb-16 sm:pt-36 sm:pb-24">
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-4xl mx-auto mb-10 md:mb-14">
       <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-slate-900 mb-4 md:mb-6 tracking-tighter leading-[1] md:leading-[0.85]">
         Explore Our{" "}

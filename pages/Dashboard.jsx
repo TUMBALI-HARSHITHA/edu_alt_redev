@@ -486,7 +486,7 @@ Module Progress: ${data.progress}%`}</title>
     hidden: { opacity: 0, y: 15 },
     show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 15 } }
   };
-  return <div className="min-h-screen pt-24 sm:pt-28 pb-16 sm:pb-20 px-3 sm:px-4 md:px-8 "> <div className="max-w-7xl mx-auto">
+  return <div className="min-h-screen pt-28 sm:pt-36 pb-16 sm:pb-20 px-3 sm:px-4 md:px-8 "> <div className="max-w-7xl mx-auto">
 
         {
     /* ── Glowing Header welcoming section ── */

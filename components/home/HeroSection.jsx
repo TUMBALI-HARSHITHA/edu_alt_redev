@@ -10,7 +10,7 @@ const HeroSection = () => {
   const user = auth.currentUser;
 
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-16 sm:pt-24 pb-32 sm:pb-40 overflow-hidden">
+    <section className="relative min-h-[90vh] flex items-center pt-28 sm:pt-36 pb-32 sm:pb-40 overflow-hidden">
       {/* Soft background glow */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#E0F2FE]/50 blur-[150px] rounded-full" />
