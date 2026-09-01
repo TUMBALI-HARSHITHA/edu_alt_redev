@@ -40,12 +40,12 @@ const HeroSection = () => {
         </div>
 
         {/* Hero Left: Text, Metrics, Buttons */}
-        <div className="lg:col-span-6 text-left space-y-6 order-2 lg:order-1">
+        <div className="lg:col-span-6 text-center lg:text-left space-y-6 order-2 lg:order-1">
           <MotionH1
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9]"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9] text-center lg:text-left"
           >
             <span style={{ fontFamily: 'Georgia, serif' }}>Learn. Build.</span><br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0047AB] to-[#3CB371] font-bitcount" style={{ fontFamily: '"Bitcount Prop Single", cursive, sans-serif' }}>
@@ -58,7 +58,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="flex flex-wrap gap-4 pt-1"
+            className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-1"
           >
             <Button
               variant="dark"
