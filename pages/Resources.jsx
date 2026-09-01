@@ -415,7 +415,7 @@ const Resources = () => {
         <title>Learning Resources | Edu Alt Tech</title>
         <link rel="canonical" href="https://www.edualttech.com/#/resources" />
       </Helmet>
-      <div className="min-h-screen pt-28 pb-32 px-4 sm:px-6 relative overflow-hidden">
+      <div className="min-h-screen pt-40 md:pt-24 lg:pt-28 pb-32 px-4 sm:px-6 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[60px] rounded-full pointer-events-none" />
         <div className="max-w-[1400px] mx-auto relative z-10">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto mb-12 text-center">

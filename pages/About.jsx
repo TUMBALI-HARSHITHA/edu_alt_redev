@@ -5,7 +5,7 @@ import { Target, Users, BookOpen, Rocket, Globe, HeartHandshake, Sparkles, Linke
 import { TEAM, SUPPORTING_TEAM } from "../constants";
 import { MotionDiv } from "../src/shared/hooks/useMotion";
 const About = () => {
-  return <div className="min-h-screen pt-28 sm:pt-36 pb-24 sm:pb-32 transition-colors duration-300 relative overflow-hidden">
+  return <div className="min-h-screen pt-40 md:pt-24 lg:pt-28 pb-24 sm:pb-32 transition-colors duration-300 relative overflow-hidden">
       <div className="fixed inset-0 overflow-hidden pointer-events-none"> <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-500/10 blur-[60px] rounded-full" />
         <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500/10 blur-[60px] rounded-full" /> <div className="absolute top-[30%] left-[20%] w-[300px] h-[300px] bg-purple-500/10 blur-[60px] rounded-full" />
       </div>

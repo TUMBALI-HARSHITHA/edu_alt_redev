@@ -20,7 +20,7 @@ const Login = () => {
   }, [location]);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 flex flex-col items-center justify-center pt-28 sm:pt-36 pb-12 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50/50 flex flex-col items-center justify-center pt-40 md:pt-24 lg:pt-28 pb-12 px-4 relative overflow-hidden">
       {/* 3-Second Floating Alert Banner */}
       <AnimatePresence>
         {alertMessage && (

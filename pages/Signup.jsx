@@ -5,7 +5,7 @@ import AuthCard from '../components/AuthCard';
 
 const Signup = () => {
   return (
-    <div className="min-h-screen bg-slate-50/50 flex flex-col items-center justify-center pt-28 sm:pt-36 pb-12 px-4 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50/50 flex flex-col items-center justify-center pt-40 md:pt-24 lg:pt-28 pb-12 px-4 relative overflow-hidden">
       {/* Soft background glow matching other pages */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#E0F2FE]/60 blur-[150px] rounded-full" />

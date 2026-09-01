@@ -46,7 +46,7 @@ const Contact = () => {
       setSending(false);
     }
   };
-  return <div className="pt-32 pb-32 px-6 [#020617] min-h-screen relative overflow-hidden">
+  return <div className="pt-40 md:pt-24 lg:pt-28 pb-32 px-6 [#020617] min-h-screen relative overflow-hidden">
  <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-emerald-500/5 to-indigo-500/5 rounded-full blur-[60px] pointer-events-none -translate-y-1/3 translate-x-1/3" /> <div className="max-w-[1400px] mx-auto relative z-10">
  <motion.div
     initial={{ opacity: 0, y: 30 }}

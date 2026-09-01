@@ -316,7 +316,7 @@ const Practice = () => {
   const displayedEnglish = useMemo(() => {
     return !user ? filteredEnglish.slice(0, 3) : filteredEnglish;
   }, [filteredEnglish, user]);
-  return <div className="practice-page-container min-h-screen pt-28 pb-20 sm:pt-36 sm:pb-32 px-4 md:px-6 relative overflow-hidden">
+  return <div className="practice-page-container min-h-screen pt-40 md:pt-24 lg:pt-28 pb-20 sm:pb-32 px-4 md:px-6 relative overflow-hidden">
   <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[60px] rounded-full max-w-full" /> <div className="max-w-[1400px] mx-auto relative z-10">
   <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="max-w-5xl mx-auto mb-12 text-center flex flex-col items-center">
     <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 mb-6 tracking-tighter leading-tight text-center">
