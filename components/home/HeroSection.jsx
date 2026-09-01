@@ -10,29 +10,48 @@ const HeroSection = () => {
   const user = auth.currentUser;
 
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-56 md:pt-24 lg:pt-28 pb-32 sm:pb-40 overflow-hidden">
+    <section className="relative min-h-[90vh] flex items-center pt-28 sm:pt-32 md:pt-24 lg:pt-28 pb-20 sm:pb-32 overflow-hidden">
       {/* Soft background glow */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] bg-[#E0F2FE]/50 blur-[150px] rounded-full" />
         <div className="absolute bottom-[10%] right-[0%] w-[600px] h-[600px] bg-[#DCFCE7]/50 blur-[150px] rounded-full" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10 w-full grid lg:grid-cols-12 gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-6 relative z-10 w-full grid lg:grid-cols-12 gap-6 lg:gap-12 items-center">
+        
+        {/* Mobile Image (Shifted ABOVE Learn Build Innovate on mobile view) */}
+        <div className="lg:col-span-6 relative flex justify-center lg:justify-end order-1 lg:order-2 mb-2 lg:mb-0">
+          <MotionDiv
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="w-full max-w-[210px] sm:max-w-[250px] lg:max-w-[480px] relative mx-auto lg:mr-0 overflow-hidden h-[140px] sm:h-[170px] lg:h-auto rounded-t-full lg:rounded-full"
+          >
+            <img 
+              src="/hero_students_nobg.jpg" 
+              alt="Students learning on a tablet" 
+              className="w-full h-auto object-cover object-top"
+              style={{ 
+                WebkitMaskImage: 'radial-gradient(ellipse at top, black 65%, transparent 100%)', 
+                maskImage: 'radial-gradient(ellipse at top, black 65%, transparent 100%)' 
+              }}
+            />
+          </MotionDiv>
+        </div>
+
         {/* Hero Left: Text, Metrics, Buttons */}
-        <div className="lg:col-span-6 text-left space-y-6">
+        <div className="lg:col-span-6 text-left space-y-6 order-2 lg:order-1">
           <MotionH1
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="mt-8 md:mt-0 text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9]"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9]"
           >
             <span style={{ fontFamily: 'Georgia, serif' }}>Learn. Build.</span><br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0047AB] to-[#3CB371] font-bitcount" style={{ fontFamily: '"Bitcount Prop Single", cursive, sans-serif' }}>
               Innovate.
             </span>
           </MotionH1>
-
-
 
           {/* 2 Buttons positioned directly below Innovate */}
           <MotionDiv
@@ -83,25 +102,6 @@ const HeroSection = () => {
           </MotionDiv>
         </div>
 
-        {/* Hero Right: Image */}
-        <div className="lg:col-span-6 relative flex justify-end">
-          <MotionDiv
-             initial={{ opacity: 0, scale: 0.95 }}
-             animate={{ opacity: 1, scale: 1 }}
-             transition={{ duration: 1, delay: 0.4 }}
-             className="w-full max-w-[480px] relative mx-auto lg:mr-0"
-          >
-            <img 
-              src="/hero_students_nobg.jpg" 
-              alt="Students learning on a tablet" 
-              className="w-full h-auto object-contain rounded-full"
-              style={{ 
-                WebkitMaskImage: 'radial-gradient(circle, black 50%, transparent 80%)', 
-                maskImage: 'radial-gradient(circle, black 50%, transparent 80%)' 
-              }}
-            />
-          </MotionDiv>
-        </div>
       </div>
     </section>
   );
