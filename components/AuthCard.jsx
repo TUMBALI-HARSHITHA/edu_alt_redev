@@ -362,7 +362,7 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
 
         {/* MOBILE STACKED LAYOUT (<768px) */}
         <div className="md:hidden flex flex-col w-full">
-          <div className="w-full py-8 px-6 bg-gradient-to-r from-[#FFB703] via-[#FFA000] to-[#E65100] text-center shadow-md">
+          <div className="w-full py-8 px-6 bg-gradient-to-br from-[#34D399] via-[#10B981] to-[#059669] text-center shadow-md">
             <AnimatePresence mode="wait">
               <motion.div
                 key={isLogin ? 'mob-login-head' : 'mob-reg-head'}
