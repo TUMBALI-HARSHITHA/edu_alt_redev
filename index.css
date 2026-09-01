@@ -1,4 +1,10 @@
-@import url('https://fonts.cdnfonts.com/css/bitcount-prop-single');
+@font-face {
+  font-family: 'Bitcount Prop Single';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/bitcountpropsingle/v3/-W-gXIv9SyXT0xz0E9pIHCxbW8ZMGEVdhz4VoumsGFhzYseFqK9f_KOwYjYsHSocfu1DlxztzQH877SgJ2SUzQ4SJdODLz0JoLU3vXFrqXQooCdbs921GXZlLGU.ttf') format('truetype');
+}
 
 @tailwind base;
 @tailwind components;
