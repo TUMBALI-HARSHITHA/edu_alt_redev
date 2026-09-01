@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Lock, Mail, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { User, Lock, Mail, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { auth, db, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, setDoc, doc, serverTimestamp } from '../lib/firebase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const AuthCard = ({ initialState = 'login', onSuccess }) => {
   const [isLogin, setIsLogin] = useState(initialState === 'login');
@@ -13,7 +13,20 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [alertNotice, setAlertNotice] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const msg = location?.state?.alert || location?.state?.message || new URLSearchParams(location?.search || '').get('alert');
+    if (msg) {
+      setAlertNotice(msg);
+      const timer = setTimeout(() => {
+        setAlertNotice('');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [location]);
 
   const toggleState = () => {
     setIsAnimating(true);
@@ -146,6 +159,21 @@ export const AuthCard = ({ initialState = 'login', onSuccess }) => {
                   <h1 className="text-[34px] font-black text-[#0047AB] mb-6 leading-[1.2] italic font-georgia" style={{ fontFamily: 'Georgia, serif' }}>
                     Login
                   </h1>
+
+                  <AnimatePresence>
+                    {alertNotice && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.25 }}
+                        className="mb-4 p-3 bg-amber-500/10 border border-amber-500/30 text-amber-700 text-xs font-bold rounded-xl flex items-center gap-2 shadow-sm"
+                      >
+                        <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                        <span>{alertNotice}</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   {error && (
                     <div className="mb-4 p-3 bg-red-50 text-red-600 text-xs font-semibold rounded-xl border border-red-200">

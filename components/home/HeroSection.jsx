@@ -2,8 +2,13 @@ import React from "react";
 import { MotionDiv, MotionH1, MotionP } from "../../src/shared/hooks/useMotion";
 import { ArrowRight } from "lucide-react";
 import Button from "../Button";
+import { auth } from "../../lib/firebase";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+  const user = auth.currentUser;
+
   return (
     <section className="relative min-h-[90vh] flex items-center pt-16 sm:pt-24 pb-32 sm:pb-40 overflow-hidden">
       {/* Soft background glow */}
@@ -36,7 +41,16 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex flex-wrap gap-4 pt-1"
           >
-            <Button variant="dark" to="/courses" className="bg-slate-950 hover:bg-[#3CB371] text-white border-none rounded-full px-8 py-3.5 text-sm font-bold shadow-md transition-all">
+            <Button
+              variant="dark"
+              to={!user ? "/login" : "/courses"}
+              state={!user ? { alert: "login to access resources..." } : undefined}
+              onClick={!user ? (e) => {
+                e.preventDefault();
+                navigate('/login', { state: { alert: "login to access resources..." } });
+              } : undefined}
+              className="bg-slate-950 hover:bg-[#3CB371] text-white border-none rounded-full px-8 py-3.5 text-sm font-bold shadow-md transition-all"
+            >
               Explore Courses <ArrowRight className="w-4 h-4" />
             </Button>
             <Button variant="ghost" to="/contact" className="bg-gradient-to-r from-[#0047AB] to-[#3CB371] text-white hover:opacity-90 border-none rounded-full px-8 py-3.5 text-sm font-extrabold shadow-md hover:shadow-lg transition-all">

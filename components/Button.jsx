@@ -10,10 +10,10 @@ const sizes = {
   md: "px-8 py-4 rounded-2xl",
   lg: "px-10 py-5 rounded-2xl"
 };
-const Button = ({ children, variant = "primary", size = "md", to, href: _href, onClick, className = "", disabled, type = "button" }) => {
+const Button = ({ children, variant = "primary", size = "md", to, state, href: _href, onClick, className = "", disabled, type = "button" }) => {
   const base = `inline-flex items-center justify-center gap-2 font-bold transition-all duration-300 hover:-translate-y-1 active:scale-95 ${variants[variant]} ${sizes[size]} ${className}`;
   if (to) {
-    return <Link to={to} className={base}>{children}</Link>;
+    return <Link to={to} state={state} onClick={onClick} className={base}>{children}</Link>;
   }
   return <button type={type} onClick={onClick} disabled={disabled} className={base}>
       {children}

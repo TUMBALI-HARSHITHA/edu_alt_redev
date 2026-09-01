@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { auth, onAuthStateChanged, db, collection, getDocs, query } from "../lib/firebase";
 import { Search, Book, Sparkles, Globe, GraduationCap, Compass, ExternalLink, Clock, CircleDollarSign, X } from "lucide-react";
 import { normalizeSearch } from "../lib/search";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import LoginModal from "../components/LoginModal";
 import { PLATFORM_COURSES } from "../data/platformCourses";
@@ -28,6 +28,7 @@ const PROVIDER_LOGOS = {
   "Hugging Face": "https://huggingface.co/front/assets/huggingface_logo.svg"
 };
 const Courses = () => {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -229,7 +230,7 @@ const Courses = () => {
         >
           <f.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> {f.label}
         </button>
-      ))}
+      ))}s alert)
 
       <div className="w-px h-7 sm:h-8 bg-slate-200 self-center mx-1" />
       {[
@@ -337,7 +338,7 @@ const Courses = () => {
                           </span>
                         ) : !user ? (
                           <button
-                            onClick={() => setIsAuthModalOpen(true)}
+                            onClick={() => navigate('/login', { state: { alert: "login to access resources..." } })}
                             className="inline-flex items-center justify-center gap-2 w-full py-3.5 bg-slate-900 text-white rounded-xl font-bold text-xs sm:text-sm tracking-wide hover:bg-slate-800 transition-all active:scale-[0.98] shadow-md"
                           >
                             Explore Course →
@@ -461,7 +462,7 @@ const Courses = () => {
                       </span>
                       {!user ? (
                         <button
-                          onClick={() => setIsAuthModalOpen(true)}
+                          onClick={() => navigate('/login', { state: { alert: "login to access resources..." } })}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-slate-800 transition-all active:scale-[0.98] shadow-sm"
                         >
                           Start Free <ExternalLink className="w-3 h-3" />
